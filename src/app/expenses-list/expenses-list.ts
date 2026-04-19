@@ -11,6 +11,13 @@ type CategoryOption = {
 
 type SortOption = 'date-desc' | 'date-asc' | 'amount-desc' | 'amount-asc';
 type DateRangeFilter = 'all' | 'this-month' | 'last-month' | 'custom';
+type SummaryItem = {
+  label: string;
+  total: number;
+};
+type CategorySummaryItem = SummaryItem & {
+  category: ExpenseCategory;
+};
 
 const CATEGORY_OPTIONS: CategoryOption[] = [
   { value: 'Food', icon: '🍽️', colorClass: 'bg-orange-100 text-orange-700' },
@@ -71,6 +78,57 @@ export class ExpancesListComponent implements OnInit {
       .filter((expense) => this.matchesCategory(expense))
       .filter((expense) => this.matchesDateRange(expense))
       .sort((left, right) => this.compareExpenses(left, right));
+  }
+
+  get visibleTotal(): number {
+    return this.filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+  }
+
+  get monthlyBreakdown(): SummaryItem[] {
+    const totalsByMonth = new Map<string, { total: number; sortKey: number }>();
+
+    for (const expense of this.filteredExpenses) {
+      const monthStart = new Date(expense.date.getFullYear(), expense.date.getMonth(), 1);
+      const label = expense.date.toLocaleDateString(undefined, {
+        month: 'long',
+        year: 'numeric',
+      });
+      const current = totalsByMonth.get(label);
+      totalsByMonth.set(label, {
+        total: (current?.total ?? 0) + expense.amount,
+        sortKey: monthStart.getTime(),
+      });
+    }
+
+    return [...totalsByMonth.entries()]
+      .sort((left, right) => right[1].sortKey - left[1].sortKey)
+      .map(([label, value]) => ({ label, total: value.total }));
+  }
+
+  get categoryTotals(): CategorySummaryItem[] {
+    const totalsByCategory = new Map<ExpenseCategory, number>();
+
+    for (const expense of this.filteredExpenses) {
+      totalsByCategory.set(expense.category, (totalsByCategory.get(expense.category) ?? 0) + expense.amount);
+    }
+
+    return this.categories
+      .map((category) => ({
+        category: category.value,
+        label: category.value,
+        total: totalsByCategory.get(category.value) ?? 0,
+      }))
+      .filter((item) => item.total > 0);
+  }
+
+  get highestExpense(): Expenses | null {
+    return this.filteredExpenses.reduce<Expenses | null>((highest, expense) => {
+      if (!highest || expense.amount > highest.amount) {
+        return expense;
+      }
+
+      return highest;
+    }, null);
   }
 
   ngOnInit(): void {
