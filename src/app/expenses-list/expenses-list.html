@@ -16,6 +16,8 @@
     <input
       [(ngModel)]="newExpenseAmount"
       type="number"
+      min="0.01"
+      step="0.01"
       placeholder="Add your expense amount here"
       class="w-full mb-4 px-3 py-2 rounded-md bg-white/50 text-sm font-light text-gray-700 placeholder:text-xs placeholder:font-light focus:outline-none focus:ring-2 focus:ring-blue-400"
     />
@@ -24,9 +26,24 @@
     <input
       [(ngModel)]="newExpenseDate"
       type="date"
+      [max]="maxDate"
       placeholder="Select the date of expense"
       class="w-full mb-4 px-3 py-2 rounded-md bg-white/50 text-sm font-light text-gray-700 placeholder:text-xs placeholder:font-light focus:outline-none focus:ring-2 focus:ring-blue-400"
     />
+
+    <label class="block mb-2 text-gray-700 font-medium">Category</label>
+    <select
+      [(ngModel)]="newExpenseCategory"
+      class="w-full mb-4 px-3 py-2 rounded-md bg-white/50 text-sm font-light text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+    >
+      <option *ngFor="let category of categories" [ngValue]="category.value">
+        {{ category.icon }} {{ category.value }}
+      </option>
+    </select>
+
+    <div *ngIf="addExpenseErrors.length" class="mb-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+      <p *ngFor="let error of addExpenseErrors">{{ error }}</p>
+    </div>
 
     <button
       (click)="addExpense()"
@@ -35,26 +52,109 @@
       Add
     </button>
 
+    <div class="mt-6">
+      <label class="mb-2 block text-gray-700 font-medium">Filter by Category</label>
+      <select
+        [(ngModel)]="selectedCategoryFilter"
+        class="w-full rounded-md bg-white/50 px-3 py-2 text-sm font-light text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+      >
+        <option [ngValue]="allCategoriesValue">All Categories</option>
+        <option *ngFor="let category of categories" [ngValue]="category.value">
+          {{ category.icon }} {{ category.value }}
+        </option>
+      </select>
+    </div>
+
     <ul class="mt-6 space-y-3">
       <li
-        *ngFor="let expense of expenses; let i = index"
-        class="flex items-center justify-between bg-white/50 backdrop-blur-md p-3 rounded-xl shadow-md border border-white/30 hover:shadow-lg transition-all duration-200"
+        *ngFor="let expense of filteredExpenses"
+        class="bg-white/50 backdrop-blur-md p-3 rounded-xl shadow-md border border-white/30 hover:shadow-lg transition-all duration-200"
       >
-        <div class="flex items-center justify-between w-full gap-4 text-sm text-gray-700">
-          <span class="font-medium capitalize flex-1 truncate">{{ expense.title }}</span>
+        <div *ngIf="editingExpenseId !== expense.id; else editRow" class="flex items-center justify-between w-full gap-4 text-sm text-gray-700">
+          <div class="flex min-w-0 flex-1 items-center gap-3">
+            <span
+              class="inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-xs font-medium"
+              [ngClass]="getCategoryDetails(expense.category).colorClass"
+            >
+              <span>{{ getCategoryDetails(expense.category).icon }}</span>
+              <span>{{ expense.category }}</span>
+            </span>
+            <span class="min-w-0 flex-1 truncate font-medium capitalize">{{ expense.title }}</span>
+          </div>
           <span class="text-gray-600 min-w-[70px] text-center">€{{ expense.amount }}</span>
           <span class="text-gray-400 text-xs min-w-[100px] text-center">
             {{ expense.date | date : 'dd.MM.yyyy' }}
           </span>
-
-          <button
-            (click)="deleteExpense(i)"
-            class="bg-red-500 text-white text-[10px] px-1.5 py-[2px] rounded hover:bg-red-600 transition shrink-0"
-            title="Delete"
-          >
-            ✕
-          </button>
+          <div class="flex shrink-0 gap-2">
+            <button
+              (click)="startEdit(expense)"
+              class="bg-blue-500 text-white text-[10px] px-2 py-[2px] rounded hover:bg-blue-600 transition"
+              title="Edit"
+            >
+              Edit
+            </button>
+            <button
+              (click)="deleteExpense(expense.id)"
+              class="bg-red-500 text-white text-[10px] px-1.5 py-[2px] rounded hover:bg-red-600 transition"
+              title="Delete"
+            >
+              ✕
+            </button>
+          </div>
         </div>
+
+        <ng-template #editRow>
+          <div class="space-y-3">
+            <input
+              [(ngModel)]="editExpenseTitle"
+              type="text"
+              class="w-full rounded-md bg-white/70 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <input
+                [(ngModel)]="editExpenseAmount"
+                type="number"
+                min="0.01"
+                step="0.01"
+                class="w-full rounded-md bg-white/70 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+              <input
+                [(ngModel)]="editExpenseDate"
+                type="date"
+                [max]="maxDate"
+                class="w-full rounded-md bg-white/70 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+              <select
+                [(ngModel)]="editExpenseCategory"
+                class="w-full rounded-md bg-white/70 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              >
+                <option *ngFor="let category of categories" [ngValue]="category.value">
+                  {{ category.icon }} {{ category.value }}
+                </option>
+              </select>
+            </div>
+            <div class="flex gap-2">
+              <button
+                (click)="saveEdit(expense.id)"
+                class="flex-1 rounded bg-green-500 px-3 py-2 text-xs text-white transition hover:bg-green-600"
+              >
+                Save
+              </button>
+              <button
+                (click)="cancelEdit()"
+                class="flex-1 rounded bg-slate-400 px-3 py-2 text-xs text-white transition hover:bg-slate-500"
+              >
+                Cancel
+              </button>
+            </div>
+            <div
+              *ngIf="editExpenseErrors.length"
+              class="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700"
+            >
+              <p *ngFor="let error of editExpenseErrors">{{ error }}</p>
+            </div>
+          </div>
+        </ng-template>
       </li>
     </ul>
   </div>
