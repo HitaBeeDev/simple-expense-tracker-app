@@ -9,6 +9,9 @@ type CategoryOption = {
   colorClass: string;
 };
 
+type SortOption = 'date-desc' | 'date-asc' | 'amount-desc' | 'amount-asc';
+type DateRangeFilter = 'all' | 'this-month' | 'last-month' | 'custom';
+
 const CATEGORY_OPTIONS: CategoryOption[] = [
   { value: 'Food', icon: '🍽️', colorClass: 'bg-orange-100 text-orange-700' },
   { value: 'Transport', icon: '🚌', colorClass: 'bg-sky-100 text-sky-700' },
@@ -28,6 +31,18 @@ const CATEGORY_OPTIONS: CategoryOption[] = [
 export class ExpancesListComponent implements OnInit {
   readonly categories = CATEGORY_OPTIONS;
   readonly allCategoriesValue = 'All';
+  readonly sortOptions: { value: SortOption; label: string }[] = [
+    { value: 'date-desc', label: 'Date: Newest first' },
+    { value: 'date-asc', label: 'Date: Oldest first' },
+    { value: 'amount-desc', label: 'Amount: High to low' },
+    { value: 'amount-asc', label: 'Amount: Low to high' },
+  ];
+  readonly dateRangeOptions: { value: DateRangeFilter; label: string }[] = [
+    { value: 'all', label: 'All dates' },
+    { value: 'this-month', label: 'This month' },
+    { value: 'last-month', label: 'Last month' },
+    { value: 'custom', label: 'Custom range' },
+  ];
   newExpenseTitle: string = '';
   newExpenseAmount: number | null = null;
   newExpenseDate: string = '';
@@ -42,15 +57,20 @@ export class ExpancesListComponent implements OnInit {
   editExpenseErrors: string[] = [];
 
   selectedCategoryFilter: ExpenseCategory | 'All' = 'All';
+  selectedSort: SortOption = 'date-desc';
+  selectedDateRange: DateRangeFilter = 'all';
+  customStartDate: string = '';
+  customEndDate: string = '';
+  searchQuery: string = '';
   expenses: Expenses[] = [];
   readonly maxDate = this.formatDateForInput(new Date());
 
   get filteredExpenses(): Expenses[] {
-    if (this.selectedCategoryFilter === this.allCategoriesValue) {
-      return this.expenses;
-    }
-
-    return this.expenses.filter((expense) => expense.category === this.selectedCategoryFilter);
+    return [...this.expenses]
+      .filter((expense) => this.matchesSearch(expense))
+      .filter((expense) => this.matchesCategory(expense))
+      .filter((expense) => this.matchesDateRange(expense))
+      .sort((left, right) => this.compareExpenses(left, right));
   }
 
   ngOnInit(): void {
@@ -154,6 +174,23 @@ export class ExpancesListComponent implements OnInit {
     return this.categories.find((option) => option.value === category) ?? this.categories.at(-1)!;
   }
 
+  get hasActiveFilters(): boolean {
+    return (
+      this.searchQuery.trim().length > 0 ||
+      this.selectedCategoryFilter !== this.allCategoriesValue ||
+      this.selectedDateRange !== 'all'
+    );
+  }
+
+  clearFilters() {
+    this.searchQuery = '';
+    this.selectedCategoryFilter = 'All';
+    this.selectedDateRange = 'all';
+    this.customStartDate = '';
+    this.customEndDate = '';
+    this.selectedSort = 'date-desc';
+  }
+
   private validateExpense(title: string, amount: number | null, date: string): string[] {
     const errors: string[] = [];
     const trimmedTitle = title.trim();
@@ -180,6 +217,66 @@ export class ExpancesListComponent implements OnInit {
 
   private saveExpenses() {
     localStorage.setItem('expenses', JSON.stringify(this.expenses));
+  }
+
+  private matchesSearch(expense: Expenses): boolean {
+    const normalizedQuery = this.searchQuery.trim().toLocaleLowerCase();
+
+    if (!normalizedQuery) {
+      return true;
+    }
+
+    return expense.title.toLocaleLowerCase().includes(normalizedQuery);
+  }
+
+  private matchesCategory(expense: Expenses): boolean {
+    if (this.selectedCategoryFilter === this.allCategoriesValue) {
+      return true;
+    }
+
+    return expense.category === this.selectedCategoryFilter;
+  }
+
+  private matchesDateRange(expense: Expenses): boolean {
+    if (this.selectedDateRange === 'all') {
+      return true;
+    }
+
+    const expenseTime = expense.date.getTime();
+    const today = new Date();
+
+    if (this.selectedDateRange === 'this-month') {
+      const start = new Date(today.getFullYear(), today.getMonth(), 1).getTime();
+      const end = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999).getTime();
+      return expenseTime >= start && expenseTime <= end;
+    }
+
+    if (this.selectedDateRange === 'last-month') {
+      const start = new Date(today.getFullYear(), today.getMonth() - 1, 1).getTime();
+      const end = new Date(today.getFullYear(), today.getMonth(), 0, 23, 59, 59, 999).getTime();
+      return expenseTime >= start && expenseTime <= end;
+    }
+
+    const start = this.customStartDate ? new Date(this.customStartDate).getTime() : Number.NEGATIVE_INFINITY;
+    const end = this.customEndDate
+      ? new Date(this.customEndDate).setHours(23, 59, 59, 999)
+      : Number.POSITIVE_INFINITY;
+
+    return expenseTime >= start && expenseTime <= end;
+  }
+
+  private compareExpenses(left: Expenses, right: Expenses): number {
+    switch (this.selectedSort) {
+      case 'date-asc':
+        return left.date.getTime() - right.date.getTime();
+      case 'amount-desc':
+        return right.amount - left.amount;
+      case 'amount-asc':
+        return left.amount - right.amount;
+      case 'date-desc':
+      default:
+        return right.date.getTime() - left.date.getTime();
+    }
   }
 
   private normalizeCategory(category: ExpenseCategory | undefined): ExpenseCategory {

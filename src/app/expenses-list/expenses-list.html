@@ -2,7 +2,7 @@
   class="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-purple-200 p-4"
 >
   <div
-    class="w-full max-w-md bg-white/30 backdrop-blur-lg rounded-2xl shadow-xl p-6 border border-white/40"
+    class="w-full max-w-4xl bg-white/30 backdrop-blur-lg rounded-2xl shadow-xl p-6 border border-white/40"
   >
     <label class="block mb-2 text-gray-700 font-medium">Expense Title</label>
     <input
@@ -52,17 +52,87 @@
       Add
     </button>
 
-    <div class="mt-6">
-      <label class="mb-2 block text-gray-700 font-medium">Filter by Category</label>
-      <select
-        [(ngModel)]="selectedCategoryFilter"
-        class="w-full rounded-md bg-white/50 px-3 py-2 text-sm font-light text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
-      >
-        <option [ngValue]="allCategoriesValue">All Categories</option>
-        <option *ngFor="let category of categories" [ngValue]="category.value">
-          {{ category.icon }} {{ category.value }}
-        </option>
-      </select>
+    <div class="mt-6 rounded-2xl border border-white/40 bg-white/20 p-4">
+      <div class="mb-4 flex items-center justify-between gap-3">
+        <h2 class="text-sm font-semibold text-gray-700">Search, Sort & Filter</h2>
+        <button
+          *ngIf="hasActiveFilters || selectedSort !== 'date-desc'"
+          (click)="clearFilters()"
+          class="rounded-md bg-white/60 px-3 py-1 text-xs font-medium text-gray-700 transition hover:bg-white/80"
+        >
+          Reset
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div class="md:col-span-2 xl:col-span-1">
+          <label class="mb-2 block text-gray-700 font-medium">Search Title</label>
+          <input
+            [(ngModel)]="searchQuery"
+            type="text"
+            placeholder="Search expenses..."
+            class="w-full rounded-md bg-white/50 px-3 py-2 text-sm font-light text-gray-700 placeholder:text-xs placeholder:font-light focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+        </div>
+
+        <div>
+          <label class="mb-2 block text-gray-700 font-medium">Category</label>
+          <select
+            [(ngModel)]="selectedCategoryFilter"
+            class="w-full rounded-md bg-white/50 px-3 py-2 text-sm font-light text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          >
+            <option [ngValue]="allCategoriesValue">All Categories</option>
+            <option *ngFor="let category of categories" [ngValue]="category.value">
+              {{ category.icon }} {{ category.value }}
+            </option>
+          </select>
+        </div>
+
+        <div>
+          <label class="mb-2 block text-gray-700 font-medium">Date Range</label>
+          <select
+            [(ngModel)]="selectedDateRange"
+            class="w-full rounded-md bg-white/50 px-3 py-2 text-sm font-light text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          >
+            <option *ngFor="let option of dateRangeOptions" [ngValue]="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+        </div>
+
+        <div>
+          <label class="mb-2 block text-gray-700 font-medium">Sort By</label>
+          <select
+            [(ngModel)]="selectedSort"
+            class="w-full rounded-md bg-white/50 px-3 py-2 text-sm font-light text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          >
+            <option *ngFor="let option of sortOptions" [ngValue]="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div *ngIf="selectedDateRange === 'custom'" class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label class="mb-2 block text-gray-700 font-medium">Start Date</label>
+          <input
+            [(ngModel)]="customStartDate"
+            type="date"
+            [max]="maxDate"
+            class="w-full rounded-md bg-white/50 px-3 py-2 text-sm font-light text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+        </div>
+        <div>
+          <label class="mb-2 block text-gray-700 font-medium">End Date</label>
+          <input
+            [(ngModel)]="customEndDate"
+            type="date"
+            [max]="maxDate"
+            class="w-full rounded-md bg-white/50 px-3 py-2 text-sm font-light text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+        </div>
+      </div>
     </div>
 
     <ul class="mt-6 space-y-3">
@@ -157,5 +227,9 @@
         </ng-template>
       </li>
     </ul>
+
+    <p *ngIf="!filteredExpenses.length" class="mt-6 rounded-xl bg-white/40 px-4 py-3 text-sm text-gray-600">
+      No expenses match the current search and filters.
+    </p>
   </div>
 </div>
