@@ -1,12 +1,31 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  AfterViewChecked,
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { ExpenseCategory, Expenses } from '../models/expenses';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { MOCK_EXPENSES } from '../mock-expenses';
+import {
+  ArcElement,
+  Chart,
+  DoughnutController,
+  Legend,
+  Plugin,
+  Tooltip,
+  TooltipItem,
+} from 'chart.js';
 
 type CategoryOption = {
   value: ExpenseCategory;
   icon: string;
   colorClass: string;
+  chartColor: string;
 };
 
 type SortOption = 'date-desc' | 'date-asc' | 'amount-desc' | 'amount-asc';
@@ -23,13 +42,50 @@ type ChartItem = CategorySummaryItem & {
   percentage: number;
 };
 
+Chart.register(DoughnutController, ArcElement, Tooltip, Legend);
+
+const CENTER_TEXT_PLUGIN: Plugin<'doughnut'> = {
+  id: 'centerText',
+  afterDraw(chart) {
+    const text = chart.options.plugins?.tooltip ? (chart as Chart<'doughnut'> & {
+      $centerText?: { title: string; value: string };
+    }).$centerText : undefined;
+
+    if (!text) {
+      return;
+    }
+
+    const meta = chart.getDatasetMeta(0);
+    const point = meta.data[0];
+
+    if (!point) {
+      return;
+    }
+
+    const { ctx } = chart;
+    const x = point.x;
+    const y = point.y;
+
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#7c89a5';
+    ctx.font = '700 11px Sora, Avenir Next, Segoe UI, sans-serif';
+    ctx.fillText(text.title, x, y - 12);
+    ctx.fillStyle = '#243865';
+    ctx.font = '800 18px Sora, Avenir Next, Segoe UI, sans-serif';
+    ctx.fillText(text.value, x, y + 10);
+    ctx.restore();
+  },
+};
+
 const CATEGORY_OPTIONS: CategoryOption[] = [
-  { value: 'Food', icon: '🍽️', colorClass: 'bg-orange-100 text-orange-700' },
-  { value: 'Transport', icon: '🚌', colorClass: 'bg-sky-100 text-sky-700' },
-  { value: 'Housing', icon: '🏠', colorClass: 'bg-emerald-100 text-emerald-700' },
-  { value: 'Entertainment', icon: '🎬', colorClass: 'bg-fuchsia-100 text-fuchsia-700' },
-  { value: 'Health', icon: '💊', colorClass: 'bg-rose-100 text-rose-700' },
-  { value: 'Other', icon: '🧾', colorClass: 'bg-slate-200 text-slate-700' },
+  { value: 'Food', icon: '🍽️', colorClass: 'expense-tone-1', chartColor: '#dce4f3' },
+  { value: 'Transport', icon: '🚌', colorClass: 'expense-tone-2', chartColor: '#bcc9e3' },
+  { value: 'Housing', icon: '🏠', colorClass: 'expense-tone-3', chartColor: '#9aadd3' },
+  { value: 'Entertainment', icon: '🎬', colorClass: 'expense-tone-4', chartColor: '#6f88bb' },
+  { value: 'Health', icon: '💊', colorClass: 'expense-tone-5', chartColor: '#4b659d' },
+  { value: 'Other', icon: '🧾', colorClass: 'expense-tone-6', chartColor: '#243865' },
 ];
 
 @Component({
@@ -39,7 +95,10 @@ const CATEGORY_OPTIONS: CategoryOption[] = [
   templateUrl: './expenses-list.html',
   styleUrls: ['./expenses-list.css'],
 })
-export class ExpancesListComponent implements OnInit {
+export class ExpancesListComponent implements OnInit, AfterViewInit, AfterViewChecked, OnDestroy {
+  @ViewChild('categoryChartCanvas')
+  private categoryChartCanvas?: ElementRef<HTMLCanvasElement>;
+
   readonly categories = CATEGORY_OPTIONS;
   readonly allCategoriesValue = 'All';
   readonly storageKeys = {
@@ -85,6 +144,8 @@ export class ExpancesListComponent implements OnInit {
   selectedCurrency: CurrencyCode = 'EUR';
   expenses: Expenses[] = [];
   readonly maxDate = this.formatDateForInput(new Date());
+  private categoryChart?: Chart<'doughnut'>;
+  private lastChartSignature = '';
 
   get filteredExpenses(): Expenses[] {
     return [...this.expenses]
@@ -154,7 +215,7 @@ export class ExpancesListComponent implements OnInit {
 
   ngOnInit(): void {
     const savedExpenses = localStorage.getItem(this.storageKeys.expenses);
-    const parsedExpenses = savedExpenses ? JSON.parse(savedExpenses) : [];
+    const parsedExpenses = savedExpenses ? JSON.parse(savedExpenses) : this.getInitialExpenses();
     const savedCurrency = localStorage.getItem(this.storageKeys.currency);
 
     this.expenses = parsedExpenses.map((expense: Expenses) => ({
@@ -163,6 +224,22 @@ export class ExpancesListComponent implements OnInit {
       category: this.normalizeCategory(expense.category),
     }));
     this.selectedCurrency = this.normalizeCurrency(savedCurrency);
+
+    if (!savedExpenses) {
+      this.saveExpenses();
+    }
+  }
+
+  ngAfterViewInit(): void {
+    this.renderCategoryChart();
+  }
+
+  ngAfterViewChecked(): void {
+    this.renderCategoryChart();
+  }
+
+  ngOnDestroy(): void {
+    this.categoryChart?.destroy();
   }
 
   addExpense() {
@@ -326,6 +403,94 @@ export class ExpancesListComponent implements OnInit {
     localStorage.setItem(this.storageKeys.expenses, JSON.stringify(this.expenses));
   }
 
+  private renderCategoryChart() {
+    const canvas = this.categoryChartCanvas?.nativeElement;
+
+    if (!canvas) {
+      return;
+    }
+
+    const chartSignature = JSON.stringify({
+      labels: this.categoryChartData.map((item) => item.label),
+      values: this.categoryChartData.map((item) => item.total),
+      currency: this.selectedCurrency,
+    });
+
+    if (!this.categoryChart) {
+      this.categoryChart = new Chart(canvas, {
+        type: 'doughnut',
+        data: {
+          labels: this.categoryChartData.map((item) => item.label),
+          datasets: [
+            {
+              data: this.categoryChartData.map((item) => item.total),
+              backgroundColor: this.categoryChartData.map(
+                (item) => this.getCategoryDetails(item.category).chartColor
+              ),
+              borderColor: '#f8fbff',
+              borderWidth: 4,
+              hoverOffset: 10,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '68%',
+          plugins: {
+            legend: {
+              display: false,
+            },
+            tooltip: {
+              backgroundColor: 'rgba(36, 56, 101, 0.96)',
+              titleColor: '#f8fbff',
+              bodyColor: '#e5ecf7',
+              displayColors: false,
+              padding: 12,
+              callbacks: {
+                label: (context: TooltipItem<'doughnut'>) => {
+                  const item = this.categoryChartData[context.dataIndex];
+
+                  if (!item) {
+                    return '';
+                  }
+
+                  return `${this.formatCurrency(item.total)} • ${item.percentage.toFixed(1)}%`;
+                },
+              },
+            },
+          },
+        },
+        plugins: [CENTER_TEXT_PLUGIN],
+      });
+    }
+
+    if (!this.categoryChart || this.lastChartSignature === chartSignature) {
+      return;
+    }
+
+    this.categoryChart.data.labels = this.categoryChartData.map((item) => item.label);
+    this.categoryChart.data.datasets[0].data = this.categoryChartData.map((item) => item.total);
+    this.categoryChart.data.datasets[0].backgroundColor = this.categoryChartData.map(
+      (item) => this.getCategoryDetails(item.category).chartColor
+    );
+    (this.categoryChart as Chart<'doughnut'> & {
+      $centerText?: { title: string; value: string };
+    }).$centerText = {
+      title: 'Visible',
+      value: this.formatCurrency(this.visibleTotal, 0),
+    };
+    this.categoryChart.update();
+    this.lastChartSignature = chartSignature;
+  }
+
+  private getInitialExpenses(): Expenses[] {
+    return MOCK_EXPENSES.map((expense) => ({
+      ...expense,
+      date: new Date(expense.date),
+    }));
+  }
+
   private matchesSearch(expense: Expenses): boolean {
     const normalizedQuery = this.searchQuery.trim().toLocaleLowerCase();
 
@@ -398,6 +563,15 @@ export class ExpancesListComponent implements OnInit {
 
   private escapeCsvValue(value: string): string {
     return `"${value.replaceAll('"', '""')}"`;
+  }
+
+  private formatCurrency(value: number, digits = 2): string {
+    return new Intl.NumberFormat(undefined, {
+      style: 'currency',
+      currency: this.selectedCurrency,
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits,
+    }).format(value);
   }
 
   private formatDateForInput(date: Date): string {
