@@ -11,12 +11,16 @@ type CategoryOption = {
 
 type SortOption = 'date-desc' | 'date-asc' | 'amount-desc' | 'amount-asc';
 type DateRangeFilter = 'all' | 'this-month' | 'last-month' | 'custom';
+type CurrencyCode = 'EUR' | 'USD' | 'GBP';
 type SummaryItem = {
   label: string;
   total: number;
 };
 type CategorySummaryItem = SummaryItem & {
   category: ExpenseCategory;
+};
+type ChartItem = CategorySummaryItem & {
+  percentage: number;
 };
 
 const CATEGORY_OPTIONS: CategoryOption[] = [
@@ -38,6 +42,10 @@ const CATEGORY_OPTIONS: CategoryOption[] = [
 export class ExpancesListComponent implements OnInit {
   readonly categories = CATEGORY_OPTIONS;
   readonly allCategoriesValue = 'All';
+  readonly storageKeys = {
+    expenses: 'expenses',
+    currency: 'expenseCurrency',
+  } as const;
   readonly sortOptions: { value: SortOption; label: string }[] = [
     { value: 'date-desc', label: 'Date: Newest first' },
     { value: 'date-asc', label: 'Date: Oldest first' },
@@ -49,6 +57,11 @@ export class ExpancesListComponent implements OnInit {
     { value: 'this-month', label: 'This month' },
     { value: 'last-month', label: 'Last month' },
     { value: 'custom', label: 'Custom range' },
+  ];
+  readonly currencyOptions: { value: CurrencyCode; label: string }[] = [
+    { value: 'EUR', label: 'Euro (EUR)' },
+    { value: 'USD', label: 'US Dollar (USD)' },
+    { value: 'GBP', label: 'British Pound (GBP)' },
   ];
   newExpenseTitle: string = '';
   newExpenseAmount: number | null = null;
@@ -69,6 +82,7 @@ export class ExpancesListComponent implements OnInit {
   customStartDate: string = '';
   customEndDate: string = '';
   searchQuery: string = '';
+  selectedCurrency: CurrencyCode = 'EUR';
   expenses: Expenses[] = [];
   readonly maxDate = this.formatDateForInput(new Date());
 
@@ -131,15 +145,24 @@ export class ExpancesListComponent implements OnInit {
     }, null);
   }
 
+  get categoryChartData(): ChartItem[] {
+    return this.categoryTotals.map((item) => ({
+      ...item,
+      percentage: this.visibleTotal ? (item.total / this.visibleTotal) * 100 : 0,
+    }));
+  }
+
   ngOnInit(): void {
-    const savedExpenses = localStorage.getItem('expenses');
+    const savedExpenses = localStorage.getItem(this.storageKeys.expenses);
     const parsedExpenses = savedExpenses ? JSON.parse(savedExpenses) : [];
+    const savedCurrency = localStorage.getItem(this.storageKeys.currency);
 
     this.expenses = parsedExpenses.map((expense: Expenses) => ({
       ...expense,
       date: new Date(expense.date),
       category: this.normalizeCategory(expense.category),
     }));
+    this.selectedCurrency = this.normalizeCurrency(savedCurrency);
   }
 
   addExpense() {
@@ -249,6 +272,32 @@ export class ExpancesListComponent implements OnInit {
     this.selectedSort = 'date-desc';
   }
 
+  saveCurrencyPreference() {
+    localStorage.setItem(this.storageKeys.currency, this.selectedCurrency);
+  }
+
+  exportVisibleExpensesToCsv() {
+    const header = ['Title', 'Amount', 'Currency', 'Date', 'Category'];
+    const rows = this.filteredExpenses.map((expense) => [
+      expense.title,
+      expense.amount.toFixed(2),
+      this.selectedCurrency,
+      this.formatDateForInput(expense.date),
+      expense.category,
+    ]);
+    const csvContent = [header, ...rows]
+      .map((row) => row.map((value) => this.escapeCsvValue(value)).join(','))
+      .join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.download = `expenses-${this.formatDateForInput(new Date())}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
   private validateExpense(title: string, amount: number | null, date: string): string[] {
     const errors: string[] = [];
     const trimmedTitle = title.trim();
@@ -274,7 +323,7 @@ export class ExpancesListComponent implements OnInit {
   }
 
   private saveExpenses() {
-    localStorage.setItem('expenses', JSON.stringify(this.expenses));
+    localStorage.setItem(this.storageKeys.expenses, JSON.stringify(this.expenses));
   }
 
   private matchesSearch(expense: Expenses): boolean {
@@ -339,6 +388,16 @@ export class ExpancesListComponent implements OnInit {
 
   private normalizeCategory(category: ExpenseCategory | undefined): ExpenseCategory {
     return this.categories.some((option) => option.value === category) ? category! : 'Other';
+  }
+
+  private normalizeCurrency(currency: string | null): CurrencyCode {
+    return this.currencyOptions.some((option) => option.value === currency)
+      ? (currency as CurrencyCode)
+      : 'EUR';
+  }
+
+  private escapeCsvValue(value: string): string {
+    return `"${value.replaceAll('"', '""')}"`;
   }
 
   private formatDateForInput(date: Date): string {

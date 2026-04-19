@@ -45,23 +45,45 @@
       <p *ngFor="let error of addExpenseErrors">{{ error }}</p>
     </div>
 
-    <button
-      (click)="addExpense()"
-      class="w-full py-2 mt-2 bg-purple-500 text-white rounded-md hover:bg-blue-600 transition"
-    >
-      Add
-    </button>
+    <div class="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto]">
+      <button
+        (click)="addExpense()"
+        class="w-full py-2 bg-purple-500 text-white rounded-md hover:bg-blue-600 transition"
+      >
+        Add
+      </button>
+      <div class="min-w-[180px]">
+        <label class="mb-2 block text-gray-700 font-medium">Currency</label>
+        <select
+          [(ngModel)]="selectedCurrency"
+          (ngModelChange)="saveCurrencyPreference()"
+          class="w-full rounded-md bg-white/50 px-3 py-2 text-sm font-light text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        >
+          <option *ngFor="let option of currencyOptions" [ngValue]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+    </div>
 
     <div class="mt-6 rounded-2xl border border-white/40 bg-white/20 p-4">
       <div class="mb-4 flex items-center justify-between gap-3">
         <h2 class="text-sm font-semibold text-gray-700">Search, Sort & Filter</h2>
-        <button
-          *ngIf="hasActiveFilters || selectedSort !== 'date-desc'"
-          (click)="clearFilters()"
-          class="rounded-md bg-white/60 px-3 py-1 text-xs font-medium text-gray-700 transition hover:bg-white/80"
-        >
-          Reset
-        </button>
+        <div class="flex items-center gap-2">
+          <button
+            (click)="exportVisibleExpensesToCsv()"
+            class="rounded-md bg-emerald-500 px-3 py-1 text-xs font-medium text-white transition hover:bg-emerald-600"
+          >
+            Export CSV
+          </button>
+          <button
+            *ngIf="hasActiveFilters || selectedSort !== 'date-desc'"
+            (click)="clearFilters()"
+            class="rounded-md bg-white/60 px-3 py-1 text-xs font-medium text-gray-700 transition hover:bg-white/80"
+          >
+            Reset
+          </button>
+        </div>
       </div>
 
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -139,7 +161,7 @@
       <div class="rounded-2xl border border-white/40 bg-white/25 p-4">
         <p class="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">Visible Total</p>
         <p class="mt-2 text-3xl font-semibold text-gray-800">
-          {{ visibleTotal | currency : 'EUR' : 'symbol' : '1.2-2' }}
+          {{ visibleTotal | currency : selectedCurrency : 'symbol' : '1.2-2' }}
         </p>
         <p class="mt-2 text-sm text-gray-600">
           {{ filteredExpenses.length }} expense{{ filteredExpenses.length === 1 ? '' : 's' }} in view
@@ -159,7 +181,7 @@
             </div>
             <div class="shrink-0 text-right">
               <p class="font-semibold text-gray-800">
-                {{ highestExpense.amount | currency : 'EUR' : 'symbol' : '1.2-2' }}
+                {{ highestExpense.amount | currency : selectedCurrency : 'symbol' : '1.2-2' }}
               </p>
               <span
                 class="mt-1 inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium"
@@ -190,7 +212,7 @@
           >
             <span>{{ month.label }}</span>
             <span class="font-semibold">
-              {{ month.total | currency : 'EUR' : 'symbol' : '1.2-2' }}
+              {{ month.total | currency : selectedCurrency : 'symbol' : '1.2-2' }}
             </span>
           </div>
         </div>
@@ -219,7 +241,7 @@
               <span>{{ item.label }}</span>
             </span>
             <span class="font-semibold">
-              {{ item.total | currency : 'EUR' : 'symbol' : '1.2-2' }}
+              {{ item.total | currency : selectedCurrency : 'symbol' : '1.2-2' }}
             </span>
           </div>
         </div>
@@ -227,6 +249,42 @@
         <ng-template #noCategoryTotals>
           <div class="mt-4 rounded-xl bg-white/40 px-4 py-3 text-sm text-gray-600">
             No visible expenses for category totals.
+          </div>
+        </ng-template>
+      </div>
+
+      <div class="rounded-2xl border border-white/40 bg-white/25 p-4 xl:col-span-3">
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">
+          Category Chart
+        </p>
+        <div *ngIf="categoryChartData.length; else noChartData" class="mt-4 space-y-4">
+          <div *ngFor="let item of categoryChartData" class="space-y-2">
+            <div class="flex items-center justify-between gap-3 text-sm text-gray-700">
+              <span
+                class="inline-flex items-center gap-2 rounded-full px-2 py-1 text-xs font-medium"
+                [ngClass]="getCategoryDetails(item.category).colorClass"
+              >
+                <span>{{ getCategoryDetails(item.category).icon }}</span>
+                <span>{{ item.label }}</span>
+              </span>
+              <span class="font-semibold">
+                {{ item.total | currency : selectedCurrency : 'symbol' : '1.2-2' }}
+              </span>
+            </div>
+            <div class="h-3 overflow-hidden rounded-full bg-white/50">
+              <div
+                class="h-full rounded-full transition-all duration-300"
+                [ngClass]="getCategoryDetails(item.category).colorClass"
+                [style.width.%]="item.percentage"
+              ></div>
+            </div>
+            <p class="text-xs text-gray-500">{{ item.percentage.toFixed(1) }}% of visible total</p>
+          </div>
+        </div>
+
+        <ng-template #noChartData>
+          <div class="mt-4 rounded-xl bg-white/40 px-4 py-3 text-sm text-gray-600">
+            No visible expenses for the category chart.
           </div>
         </ng-template>
       </div>
@@ -248,7 +306,9 @@
             </span>
             <span class="min-w-0 flex-1 truncate font-medium capitalize">{{ expense.title }}</span>
           </div>
-          <span class="text-gray-600 min-w-[70px] text-center">€{{ expense.amount }}</span>
+          <span class="text-gray-600 min-w-[90px] text-center">
+            {{ expense.amount | currency : selectedCurrency : 'symbol' : '1.2-2' }}
+          </span>
           <span class="text-gray-400 text-xs min-w-[100px] text-center">
             {{ expense.date | date : 'dd.MM.yyyy' }}
           </span>
