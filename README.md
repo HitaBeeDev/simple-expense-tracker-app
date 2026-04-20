@@ -11,9 +11,9 @@ Add, view, and delete your daily expenses
 
 | Metric | Score |
 |---|---|
-| Lighthouse Performance | 99 |
-| Accessibility | 96 |
-| SEO | 100 |
+| Lighthouse Performance | 100 |
+| Accessibility | 93 |
+| SEO | 92 |
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.7.
 
