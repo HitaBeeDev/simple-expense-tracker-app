@@ -1,5 +1,5 @@
 <div class="bg-[#2d3c4d] p-[1.7rem] rounded-[1rem] mt-5">
-  <div class="flex flex-row items-center justify-between">
+  <div class="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
     <p class="text-[0.8rem] font-[500] text-[#eaeef4]">New Expense</p>
     <p class="text-[0.8rem] font-[500] text-[#eaeef4]">Add a record</p>
   </div>
@@ -18,8 +18,8 @@
       />
     </div>
 
-    <div class="mt-4 grid grid-cols-2 items-center justify-center gap-3">
-      <div class="col-span-1">
+    <div class="mt-4 grid grid-cols-1 items-center justify-center gap-3 md:grid-cols-2">
+      <div class="md:col-span-1">
         <label for="expense-amount" class="text-[0.75rem] font-[400] text-[#eaeef4]">Expense Amount</label>
 
         <input
@@ -34,7 +34,7 @@
         />
       </div>
 
-      <div class="col-span-1">
+      <div class="md:col-span-1">
         <label for="expense-date" class="text-[0.75rem] font-[400] text-[#eaeef4]">Expense Date</label>
 
         <input
@@ -48,8 +48,8 @@
       </div>
     </div>
 
-    <div class="mt-4 grid grid-cols-2 items-center justify-center gap-3">
-      <div class="col-span-1">
+    <div class="mt-4 grid grid-cols-1 items-center justify-center gap-3 md:grid-cols-2">
+      <div class="md:col-span-1">
         <label for="expense-category" class="text-[0.75rem] font-[400] text-[#eaeef4]">Category</label>
 
         <select
@@ -64,7 +64,7 @@
         </select>
       </div>
 
-      <div class="col-span-1">
+      <div class="md:col-span-1">
         <label for="expense-currency" class="text-[0.75rem] font-[400] text-[#eaeef4]">Currency</label>
 
         <select

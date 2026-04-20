@@ -1,5 +1,5 @@
-<section class="grid grid-cols-9 p-7 w-full gap-5">
-  <div class="col-span-3 w-full sticky top-7 self-start">
+<section class="grid grid-cols-1 p-4 w-full gap-5 md:grid-cols-9 md:p-7">
+  <div class="w-full self-start md:col-span-3 md:sticky md:top-7">
     <app-expenses-hero />
 
     <app-new-expense-card
@@ -18,7 +18,7 @@
     />
   </div>
 
-  <div class="col-span-6 h-full w-full">
+  <div class="h-full w-full md:col-span-6">
     <app-expenses-overview
       [visibleCount]="service.filteredExpenses().length"
       [visibleTotal]="service.visibleTotal()"
