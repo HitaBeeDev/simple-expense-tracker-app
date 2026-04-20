@@ -1,0 +1,17 @@
+{
+  "name": "Simple Expense Tracker",
+  "short_name": "Expenses",
+  "description": "Track spending without losing the overview.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f7fa",
+  "theme_color": "#1e2733",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
