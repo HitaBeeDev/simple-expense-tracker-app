@@ -3,6 +3,18 @@
 A minimal expense tracker built with **Angular** and **Tailwind CSS**.  
 Add, view, and delete your daily expenses
 
+<p align="center">
+  <img src="docs/assets/preview.png" alt="Expense Tracker app screenshot" width="800" />
+</p>
+
+## Performance
+
+| Metric | Score |
+|---|---|
+| Lighthouse Performance | 99 |
+| Accessibility | 96 |
+| SEO | 100 |
+
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.7.
 
 ## Development server
