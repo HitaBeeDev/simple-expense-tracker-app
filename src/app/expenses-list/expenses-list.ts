@@ -3,6 +3,12 @@ import { ExpenseCategory, Expenses } from '../models/expenses';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MOCK_EXPENSES } from '../mock-expenses';
+import { ExpensesHeroComponent } from '../expenses-hero/expenses-hero';
+import { ExpensesActivityCardComponent } from '../expenses-activity-card/expenses-activity-card';
+import { NewExpenseCardComponent } from '../new-expense-card/new-expense-card';
+import { ExpensesOverviewComponent } from '../expenses-overview/expenses-overview';
+import { ExpenseSummariesCardComponent } from '../expense-summaries-card/expense-summaries-card';
+import { VisibleTotalCardComponent } from '../visible-total-card/visible-total-card';
 
 type CategoryOption = {
   value: ExpenseCategory;
@@ -10,6 +16,8 @@ type CategoryOption = {
   colorClass: string;
   chartColor: string;
 };
+
+type CategoryIconMap = Record<ExpenseCategory, string>;
 
 type SortOption = 'date-desc' | 'date-asc' | 'amount-desc' | 'amount-asc';
 type DateRangeFilter = 'all' | 'this-month' | 'last-month' | 'custom';
@@ -67,15 +75,34 @@ const CATEGORY_OPTIONS: CategoryOption[] = [
 @Component({
   selector: 'app-expenses-list',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [
+    FormsModule,
+    CommonModule,
+    ExpensesHeroComponent,
+    ExpensesActivityCardComponent,
+    NewExpenseCardComponent,
+    ExpensesOverviewComponent,
+    ExpenseSummariesCardComponent,
+    VisibleTotalCardComponent,
+  ],
   templateUrl: './expenses-list.html',
 })
 export class ExpancesListComponent implements OnInit {
+  readonly seedVersion = '2026-04-20-v6';
   readonly categories = CATEGORY_OPTIONS;
+  readonly categoryIcons: CategoryIconMap = {
+    Food: CATEGORY_OPTIONS.find((option) => option.value === 'Food')?.icon ?? '',
+    Transport: CATEGORY_OPTIONS.find((option) => option.value === 'Transport')?.icon ?? '',
+    Housing: CATEGORY_OPTIONS.find((option) => option.value === 'Housing')?.icon ?? '',
+    Entertainment: CATEGORY_OPTIONS.find((option) => option.value === 'Entertainment')?.icon ?? '',
+    Health: CATEGORY_OPTIONS.find((option) => option.value === 'Health')?.icon ?? '',
+    Other: CATEGORY_OPTIONS.find((option) => option.value === 'Other')?.icon ?? '',
+  };
   readonly allCategoriesValue = 'All';
   readonly storageKeys = {
     expenses: 'expenses',
     currency: 'expenseCurrency',
+    seedVersion: 'expenseSeedVersion',
   } as const;
   readonly sortOptions: { value: SortOption; label: string }[] = [
     { value: 'date-desc', label: 'Date: Newest first' },
@@ -163,7 +190,8 @@ export class ExpancesListComponent implements OnInit {
         label: category.value,
         total: totalsByCategory.get(category.value) ?? 0,
       }))
-      .filter((item) => item.total > 0);
+      .filter((item) => item.total > 0)
+      .sort((left, right) => right.total - left.total);
   }
 
   get highestExpense(): Expenses | null {
@@ -184,14 +212,17 @@ export class ExpancesListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const savedExpenses = this.readStoredExpenses();
+    const savedSeedVersion = this.readStorageValue(this.storageKeys.seedVersion);
+    const shouldReseedExpenses = savedSeedVersion !== this.seedVersion;
+    const savedExpenses = shouldReseedExpenses ? null : this.readStoredExpenses();
     const savedCurrency = this.readStorageValue(this.storageKeys.currency);
 
     this.expenses = savedExpenses ?? this.getInitialExpenses();
     this.selectedCurrency = this.normalizeCurrency(savedCurrency);
 
-    if (!savedExpenses) {
+    if (!savedExpenses || shouldReseedExpenses) {
       this.saveExpenses();
+      this.writeStorageValue(this.storageKeys.seedVersion, this.seedVersion);
     }
   }
 

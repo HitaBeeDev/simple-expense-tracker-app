@@ -1,0 +1,143 @@
+<div class="mt-5 rounded-[1rem] bg-[#d1dbe6] p-5">
+  <div>
+    <p class="text-[0.55rem] font-[700] uppercase tracking-[0.22em] text-[#456484]">Activity</p>
+
+    <p class="mt-3 text-[1.2rem] font-[600] text-[#1e2733]">Added expenses</p>
+  </div>
+
+  <div *ngIf="filteredExpenses.length; else noExpenses" class="mt-5 flex flex-col gap-4">
+    <div *ngFor="let expense of filteredExpenses; let last = last" class="rounded-[0.85rem]">
+      <div
+        *ngIf="editingExpenseId !== expense.id; else editRow"
+        class="flex flex-row items-center justify-between pl-7 pr-7 pb-4"
+      >
+        <div class="flex flex-col">
+          <p class="text-[0.9rem] font-[600] tracking-[0.22em] text-[#32455a]">
+            {{ expense.title }}
+          </p>
+
+          <p class="text-[0.8rem] font-[400] tracking-[0.22em] text-[#456484]">
+            {{ expense.date | date: 'dd.MM.yyyy' }}
+          </p>
+        </div>
+
+        <div class="flex flex-row items-center justify-center gap-4">
+          <p class="text-[0.9rem] font-[600] tracking-[0.22em] text-[#456484]">
+            {{ expense.amount | currency: selectedCurrency : 'symbol' : '1.2-2' }}
+          </p>
+
+          <button
+            type="button"
+            (click)="startEditClick.emit(expense)"
+            class="flex h-[2rem] w-fit cursor-pointer items-center justify-center rounded-full bg-[#f0fdf4] pl-4 pr-4 transition-all duration-300 hover:bg-[#bbf7d0]"
+          >
+            <span class="text-[0.8rem] font-[500] text-[#166534]">Edit</span>
+          </button>
+
+          <button
+            type="button"
+            (click)="deleteExpenseClick.emit(expense.id)"
+            class="flex h-[2rem] w-fit cursor-pointer items-center justify-center rounded-full bg-[#fef2f2] pl-4 pr-4 transition-all duration-300 hover:bg-[#fecaca]"
+          >
+            <span class="text-[0.8rem] font-[500] text-[#dc2626]">Delete</span>
+          </button>
+        </div>
+      </div>
+
+      <ng-template #editRow>
+        <div class="rounded-[1rem] bg-[#2d3c4d] p-[1.4rem]">
+          <div class="flex flex-row items-center justify-between">
+            <p class="text-[0.8rem] font-[500] text-[#eaeef4]">Edit Expense</p>
+            <p class="text-[0.8rem] font-[500] text-[#eaeef4]">Update record</p>
+          </div>
+
+          <div class="mt-4 grid grid-cols-2 items-start gap-3">
+            <div class="col-span-1">
+              <label class="text-[0.75rem] font-[400] text-[#eaeef4]">Expense Title</label>
+
+              <input
+                [ngModel]="editExpenseTitle"
+                (ngModelChange)="editExpenseTitleChange.emit($event)"
+                type="text"
+                placeholder="e.g. Grocery shopping, gym membership..."
+                class="mt-1 pl-2 pr-2 h-[2.5rem] w-full rounded-[0.5rem] bg-[#f5f7fa] text-[0.75rem] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)]"
+              />
+
+              <div class="mt-4">
+                <label class="text-[0.75rem] font-[400] text-[#eaeef4]">Category</label>
+
+                <select
+                  [ngModel]="editExpenseCategory"
+                  (ngModelChange)="editExpenseCategoryChange.emit($event)"
+                  class="mt-1 h-[2.5rem] w-full rounded-[0.5rem] bg-[#f5f7fa] pl-2 pr-2 text-[0.75rem] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)]"
+                >
+                  <option *ngFor="let category of categories" [ngValue]="category.value">
+                    {{ category.icon }} {{ category.value }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <div class="col-span-1">
+              <label class="text-[0.75rem] font-[400] text-[#eaeef4]">Expense Amount</label>
+
+              <input
+                [ngModel]="editExpenseAmount"
+                (ngModelChange)="editExpenseAmountChange.emit($event)"
+                type="number"
+                min="0.01"
+                step="0.01"
+                placeholder="Add your expense amount here"
+                class="mt-1 h-[2.5rem] w-full rounded-[0.5rem] bg-[#f5f7fa] pl-2 pr-2 text-[0.75rem] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)]"
+              />
+
+              <div class="mt-4">
+                <label class="text-[0.75rem] font-[400] text-[#eaeef4]">Expense Date</label>
+
+                <input
+                  [ngModel]="editExpenseDate"
+                  (ngModelChange)="editExpenseDateChange.emit($event)"
+                  type="date"
+                  [max]="maxDate"
+                  class="mt-1 h-[2.5rem] w-full rounded-[0.5rem] bg-[#f5f7fa] pl-2 pr-2 text-[0.75rem] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)]"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div
+            *ngIf="editExpenseErrors.length"
+            class="mt-4 rounded-[0.4rem] bg-[rgba(255,231,236,0.9)] p-1 text-[0.8rem] text-[#9f2746]"
+          >
+            <p *ngFor="let error of editExpenseErrors">{{ error }}</p>
+          </div>
+
+          <div class="mt-6 flex flex-row justify-end gap-3">
+            <button
+              type="button"
+              (click)="saveEditClick.emit(expense.id)"
+              class="flex h-[2.4rem] items-center justify-center rounded-[0.5rem] bg-[#789bb8] px-5 text-[0.76rem] font-[500] text-[#f5f7fa] transition-all duration-300 hover:bg-[#577ea0]"
+            >
+              Save Changes
+            </button>
+            <button
+              type="button"
+              (click)="cancelEditClick.emit()"
+              class="flex h-[2.4rem] items-center justify-center rounded-[0.5rem] bg-[rgba(255,255,255,0.16)] px-5 text-[0.76rem] font-[500] text-[#f5f7fa] transition-all duration-300 hover:bg-[rgba(255,255,255,0.24)]"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </ng-template>
+
+      <div *ngIf="!last" class="h-[0.05rem] w-full bg-[#f5f7fa]"></div>
+    </div>
+  </div>
+
+  <ng-template #noExpenses>
+    <div class="rounded-2xl bg-[rgba(255,255,255,0.62)] p-4 text-[0.92rem] text-[#6c7b9c]">
+      No expenses match the current search and filters.
+    </div>
+  </ng-template>
+</div>

@@ -1,110 +1,75 @@
-<section class="grid grid-cols-9 min-h-screen m-6 w-full gap-5">
+<section class="grid grid-cols-9 p-7 w-full gap-5 overflow-hidden">
   <div class="col-span-3 h-full w-full">
-    <div class="bg-[#1e2733] p-[1.6rem] rounded-[1rem]">
-      <p class="text-[0.55rem] font-[400] uppercase tracking-[0.22em] text-[#436586]">
-        Expense Dashboard
-      </p>
+    <app-expenses-hero />
 
-      <h1 class="text-[2.4rem] leading-[1.05] font-[800] tracking-[-0.04em] text-[#eaeef4] mt-4">
-        Track spending without losing the overview.
-      </h1>
-
-      <p class="text-[0.6rem] font-[600] tracking-[0.22em] text-[#d0dce7] mt-2">
-        Add expenses on the left. Review summaries, charts, and the full activity stream on the
-        right.
-      </p>
-    </div>
-
-    <div class="bg-[#2e4256] p-[1.3rem] rounded-[1rem] mt-3">
-      <div class="flex flex-row items-center justify-between">
-        <p class="text-[0.8rem] font-[500] text-[#eaeef4]">New Expense</p>
-
-        <p class="text-[0.8rem] font-[500] text-[#eaeef4]">Add a record</p>
-      </div>
-
-      <div class="mt-4">
-        <div>
-          <label class="text-[0.75rem] font-[400] text-[#eaeef4]">Expense Title</label>
-
-          <input
-            [(ngModel)]="newExpenseTitle"
-            type="text"
-            placeholder="e.g. Grocery shopping, gym membership..."
-            class="mt-1 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] px-4 py-[0.85rem] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)]"
-          />
-        </div>
-
-        <div class="mt-4 grid grid-cols-2 items-center justify-center gap-3">
-          <div class="col-span-1">
-            <label class="text-[0.75rem] font-[400] text-[#eaeef4]">Expense Amount</label>
-
-            <input
-              [(ngModel)]="newExpenseAmount"
-              type="number"
-              min="0.01"
-              step="0.01"
-              placeholder="Add your expense amount here"
-              class="mt-1 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] px-4 py-[0.85rem] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)]"
-            />
-          </div>
-
-          <div class="col-span-1">
-            <label class="text-[0.75rem] font-[400] text-[#eaeef4]">Expense Date</label>
-
-            <input
-              [(ngModel)]="newExpenseDate"
-              type="date"
-              [max]="maxDate"
-              class="mt-1 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] px-4 py-[0.85rem] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)]"
-            />
-          </div>
-        </div>
-
-        <div class="mt-4 grid grid-cols-2 items-center justify-center gap-3">
-          <div class="col-span-1">
-            <label class="text-[0.75rem] font-[400] text-[#eaeef4]">Category</label>
-
-            <select
-              [(ngModel)]="newExpenseCategory"
-              class="mt-1 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)]"
-            >
-              <option *ngFor="let category of categories" [ngValue]="category.value">
-                {{ category.icon }} {{ category.value }}
-              </option>
-            </select>
-          </div>
-
-          <div class="col-span-1">
-            <label class="text-[0.75rem] font-[400] text-[#eaeef4]">Currency</label>
-
-            <select
-              [(ngModel)]="selectedCurrency"
-              (ngModelChange)="saveCurrencyPreference()"
-              class="mt-1 h-[2.5rem] w-full text-[0.75rem] rounded-[0.5rem] bg-[#f5f7fa] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)]"
-            >
-              <option *ngFor="let option of currencyOptions" [ngValue]="option.value">
-                {{ option.label }}
-              </option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div
-        *ngIf="addExpenseErrors.length"
-        class="mt-4 rounded-[0.4rem] bg-[rgba(255,231,236,0.9)] p-1 text-[0.8rem] text-[#9f2746]"
-      >
-        <p *ngFor="let error of addExpenseErrors">{{ error }}</p>
-      </div>
-
-      <div
-        (click)="addExpense()"
-        class="mt-4 flex justify-center items-center w-full bg-[#789bb8] rounded-[0.5rem] h-[2.4rem] text-[0.76rem] font-[500] cursor-pointer text-[#f5f7fa] transition-all duration-300 hover:bg-[#577ea0]"
-      >
-        <p>Add Expense</p>
-      </div>
-    </div>
+    <app-new-expense-card
+      [(newExpenseTitle)]="newExpenseTitle"
+      [(newExpenseAmount)]="newExpenseAmount"
+      [(newExpenseDate)]="newExpenseDate"
+      [(newExpenseCategory)]="newExpenseCategory"
+      [(selectedCurrency)]="selectedCurrency"
+      [maxDate]="maxDate"
+      [categories]="categories"
+      [currencyOptions]="currencyOptions"
+      [addExpenseErrors]="addExpenseErrors"
+      (currencyPreferenceChange)="saveCurrencyPreference()"
+      (addExpenseClick)="addExpense()"
+    />
   </div>
 
-  <div class="col-span-6 h-full bg-amber-100 w-full">ghfh</div>
+  <div class="col-span-6 h-full w-full">
+    <app-expenses-overview
+      [visibleCount]="filteredExpenses.length"
+      [visibleTotal]="visibleTotal"
+      [selectedCurrency]="selectedCurrency"
+      [hasActiveFilters]="hasActiveFilters"
+      [(searchQuery)]="searchQuery"
+      [(selectedCategoryFilter)]="selectedCategoryFilter"
+      [(selectedDateRange)]="selectedDateRange"
+      [(selectedSort)]="selectedSort"
+      [(customStartDate)]="customStartDate"
+      [(customEndDate)]="customEndDate"
+      [maxDate]="maxDate"
+      [allCategoriesValue]="allCategoriesValue"
+      [categories]="categories"
+      [dateRangeOptions]="dateRangeOptions"
+      [sortOptions]="sortOptions"
+      (exportCsvClick)="exportVisibleExpensesToCsv()"
+      (resetClick)="clearFilters()"
+    />
+
+    <app-visible-total-card
+      [visibleTotal]="visibleTotal"
+      [selectedCurrency]="selectedCurrency"
+      [visibleCount]="filteredExpenses.length"
+      [highestExpense]="highestExpense"
+      [highestExpenseCategoryIcon]="
+        highestExpense ? getCategoryDetails(highestExpense.category).icon : ''
+      "
+    />
+
+    <app-expense-summaries-card
+      [monthlyBreakdown]="monthlyBreakdown"
+      [categoryTotals]="categoryTotals"
+      [selectedCurrency]="selectedCurrency"
+      [categoryIcons]="categoryIcons"
+    />
+
+    <app-expenses-activity-card
+      [filteredExpenses]="filteredExpenses"
+      [selectedCurrency]="selectedCurrency"
+      [editingExpenseId]="editingExpenseId"
+      [(editExpenseTitle)]="editExpenseTitle"
+      [(editExpenseAmount)]="editExpenseAmount"
+      [(editExpenseDate)]="editExpenseDate"
+      [(editExpenseCategory)]="editExpenseCategory"
+      [editExpenseErrors]="editExpenseErrors"
+      [categories]="categories"
+      [maxDate]="maxDate"
+      (startEditClick)="startEdit($event)"
+      (saveEditClick)="saveEdit($event)"
+      (cancelEditClick)="cancelEdit()"
+      (deleteExpenseClick)="deleteExpense($event)"
+    />
+  </div>
 </section>
