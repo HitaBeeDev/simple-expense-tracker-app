@@ -1,7 +1,7 @@
 <div class="bg-gradient-to-b from-white/80 to-[#e1e9f6]/75 mt-5 rounded-[1rem] p-[1.3rem]">
   <div class="flex flex-row items-start justify-between">
     <div>
-      <p class="text-[0.55rem] font-[700] uppercase tracking-[0.22em] text-[#456484]">
+      <p class="text-[0.55rem] font-[700] uppercase tracking-[0.22em] text-[#2e4a62]">
         Visible Total
       </p>
 
@@ -9,7 +9,7 @@
         {{ visibleTotal | currency: selectedCurrency : 'symbol' : '1.2-2' }}
       </p>
 
-      <p class="text-[0.65rem] font-[300] tracking-[0.22em] text-[#456484]">
+      <p class="text-[0.65rem] font-[300] tracking-[0.22em] text-[#2e4a62]">
         {{ visibleCount }} expense{{ visibleCount === 1 ? '' : 's' }} in current view
       </p>
     </div>
@@ -28,7 +28,7 @@
             {{ highestExpenseItem.title }}
           </p>
 
-          <p class="text-[0.7rem] font-[300] text-[#7999b7] mt-2">
+          <p class="text-[0.7rem] font-[300] text-[#38516c] mt-2">
             {{ highestExpenseItem.date | date: 'dd.MM.yyyy' }}
           </p>
         </div>

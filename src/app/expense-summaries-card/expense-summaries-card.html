@@ -1,17 +1,17 @@
 <div class="grid grid-cols-2 gap-5 mt-5">
   <div class="col-span-1 p-5 rounded-[1rem] bg-[#eaeef4]/60">
-    <p class="text-[0.55rem] font-[700] uppercase tracking-[0.22em] text-[#456484]">
+    <p class="text-[0.55rem] font-[700] uppercase tracking-[0.22em] text-[#2e4a62]">
       Monthly Breakdown
     </p>
 
     <div *ngIf="monthlyBreakdown.length; else noMonthlyBreakdown" class="mt-4">
       <div class="flex flex-col mt-3" *ngFor="let month of monthlyBreakdown; let last = last">
         <div class="flex flex-row items-center justify-between ml-3 mr-3 mb-[0.4rem]">
-          <p class="text-[0.8rem] font-[400] tracking-[0.22em] text-[#456484]">
+          <p class="text-[0.8rem] font-[400] tracking-[0.22em] text-[#2e4a62]">
             {{ month.label }}
           </p>
 
-          <p class="text-[0.9rem] font-[600] tracking-[0.22em] text-[#456484]">
+          <p class="text-[0.9rem] font-[600] tracking-[0.22em] text-[#2e4a62]">
             {{ month.total | currency: selectedCurrency : 'symbol' : '1.2-2' }}
           </p>
         </div>
@@ -21,14 +21,14 @@
     </div>
 
     <ng-template #noMonthlyBreakdown>
-      <div class="rounded-2xl bg-[rgba(255,255,255,0.62)] p-4 text-[0.92rem] text-[#6c7b9c]">
+      <div class="rounded-2xl bg-[rgba(255,255,255,0.62)] p-4 text-[0.92rem] text-[#4a5e78]">
         No visible expenses for monthly totals.
       </div>
     </ng-template>
   </div>
 
   <div class="col-span-1 p-5 rounded-[1rem] bg-white">
-    <p class="text-[0.55rem] font-[700] uppercase tracking-[0.22em] text-[#456484]">
+    <p class="text-[0.55rem] font-[700] uppercase tracking-[0.22em] text-[#2e4a62]">
       Category Totals
     </p>
 
@@ -36,16 +36,16 @@
       <div class="flex flex-col mt-3" *ngFor="let item of categoryTotals; let last = last">
         <div class="flex flex-row items-center justify-between ml-3 mr-3 mb-[0.4rem]">
           <div class="flex flex-row items-center gap-3">
-            <p class="text-[0.8rem] font-[400] tracking-[0.22em] text-[#456484]">
+            <p class="text-[0.8rem] font-[400] tracking-[0.22em] text-[#2e4a62]">
               {{ categoryIcons[item.category] }}
             </p>
 
-            <p class="text-[0.8rem] font-[400] tracking-[0.22em] text-[#456484]">
+            <p class="text-[0.8rem] font-[400] tracking-[0.22em] text-[#2e4a62]">
               {{ item.label }}
             </p>
           </div>
 
-          <p class="text-[0.9rem] font-[600] tracking-[0.22em] text-[#456484]">
+          <p class="text-[0.9rem] font-[600] tracking-[0.22em] text-[#2e4a62]">
             {{ item.total | currency: selectedCurrency : 'symbol' : '1.2-2' }}
           </p>
         </div>
@@ -55,7 +55,7 @@
     </div>
 
     <ng-template #noCategoryTotals>
-      <div class="rounded-2xl bg-[rgba(255,255,255,0.62)] p-4 text-[0.92rem] text-[#6c7b9c]">
+      <div class="rounded-2xl bg-[rgba(255,255,255,0.62)] p-4 text-[0.92rem] text-[#4a5e78]">
         No visible expenses for category totals.
       </div>
     </ng-template>

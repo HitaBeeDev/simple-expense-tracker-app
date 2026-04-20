@@ -1,24 +1,8 @@
 <div class="bg-[#32455a] p-[1.3rem] rounded-[1rem]">
-  <p class="text-[0.55rem] font-[400] uppercase tracking-[0.22em] text-[#587d9f]">Overview</p>
+  <p class="text-[0.55rem] font-[400] uppercase tracking-[0.22em] text-[#a5c5da]">Overview</p>
 
   <div class="flex flex-row items-center justify-between mt-4">
     <h2 class="text-[1.2rem] font-[600] text-[#eaeef4]">Added expenses and live summaries</h2>
-
-    <div class="flex flex-row items-center gap-3">
-      <div
-        class="bg-[#eaeef4] rounded-full w-fit pl-4 pr-4 h-[1.9rem] flex items-center justify-center"
-      >
-        <p class="font-[500] text-[#587d9f] text-[0.9rem]">{{ visibleCount }} visible</p>
-      </div>
-
-      <div
-        class="bg-[#eaeef4] rounded-full w-fit pl-4 pr-4 h-[1.9rem] flex items-center justify-center"
-      >
-        <p class="font-[700] text-[#2d3c4d] text-[0.9rem]">
-          {{ visibleTotal | currency: selectedCurrency : 'symbol' : '1.2-2' }}
-        </p>
-      </div>
-    </div>
   </div>
 
   <div>
@@ -26,50 +10,52 @@
       <p class="font-[500] text-[#d1dbe6] text-[0.9rem]">Search, sort, filter</p>
 
       <div class="flex flex-row items-center gap-3">
-        <div
-          class="bg-[#dcfce7] rounded-full w-fit pl-5 pr-5 h-[2.1rem] flex items-center justify-center cursor-pointer transition-all duration-300 hover:bg-[#bbf7d0]"
+        <button
+          type="button"
+          (click)="exportCsvClick.emit()"
+          aria-label="Export expenses as CSV"
+          class="bg-[#dcfce7] rounded-full w-fit pl-5 pr-5 h-[2.1rem] flex items-center justify-center cursor-pointer transition-all duration-300 hover:bg-[#bbf7d0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#166534] font-[500] text-[#166534] text-[0.75rem]"
         >
-          <button
-            (click)="exportCsvClick.emit()"
-            class="font-[500] text-[#166534] text-[0.75rem] cursor-pointer"
-          >
-            Export CSV
-          </button>
-        </div>
+          Export CSV
+        </button>
 
-        <div
-          class="bg-[#6b7280] rounded-full w-fit pl-5 pr-5 h-[2.1rem] flex items-center justify-center cursor-pointer transition-all duration-300 hover:bg-[#9ca3af]"
+        <button
+          type="button"
+          (click)="resetClick.emit()"
+          aria-label="Reset all filters"
+          class="bg-[#6b7280] rounded-full w-fit pl-5 pr-5 h-[2.1rem] flex items-center justify-center cursor-pointer transition-all duration-300 hover:bg-[#9ca3af] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6b7280] font-[400] text-[#f9fafb] text-[0.75rem]"
         >
-          <button
-            (click)="resetClick.emit()"
-            class="font-[400] text-[#f9fafb] text-[0.75rem] cursor-pointer"
-          >
-            Reset filters
-          </button>
-        </div>
+          Reset filters
+        </button>
       </div>
     </div>
 
     <div class="grid grid-cols-2 gap-3">
       <div class="col-span-1">
-        <label class="text-[0.75rem] font-[400] text-[#eaeef4]">Search Title</label>
+        <label for="search-title" class="text-[0.75rem] font-[400] text-[#eaeef4]"
+          >Search Title</label
+        >
 
         <input
+          id="search-title"
           [ngModel]="searchQuery"
           (ngModelChange)="searchQueryChange.emit($event)"
           type="text"
           placeholder="Search expenses..."
-          class="pl-2 pr-2 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)]"
+          class="pl-2 pr-2 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)] focus-visible:ring-2 focus-visible:ring-[#789bb8]"
         />
       </div>
 
       <div class="col-span-1">
-        <label class="text-[0.75rem] font-[400] text-[#eaeef4]">Category</label>
+        <label for="filter-category" class="text-[0.75rem] font-[400] text-[#eaeef4]"
+          >Category</label
+        >
 
         <select
+          id="filter-category"
           [ngModel]="selectedCategoryFilter"
           (ngModelChange)="selectedCategoryFilterChange.emit($event)"
-          class="pl-2 pr-2 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)]"
+          class="pl-2 pr-2 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)] focus-visible:ring-2 focus-visible:ring-[#789bb8]"
         >
           <option [ngValue]="allCategoriesValue">All Categories</option>
           <option *ngFor="let category of categories" [ngValue]="category.value">
@@ -79,12 +65,13 @@
       </div>
 
       <div class="col-span-1">
-        <label class="text-[0.75rem] font-[400] text-[#eaeef4]">Date Range</label>
+        <label for="date-range" class="text-[0.75rem] font-[400] text-[#eaeef4]">Date Range</label>
 
         <select
+          id="date-range"
           [ngModel]="selectedDateRange"
           (ngModelChange)="selectedDateRangeChange.emit($event)"
-          class="pl-2 pr-2 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)]"
+          class="pl-2 pr-2 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)] focus-visible:ring-2 focus-visible:ring-[#789bb8]"
         >
           <option *ngFor="let option of dateRangeOptions" [ngValue]="option.value">
             {{ option.label }}
@@ -93,12 +80,13 @@
       </div>
 
       <div class="col-span-1">
-        <label class="text-[0.75rem] font-[400] text-[#eaeef4]">Sort By</label>
+        <label for="sort-by" class="text-[0.75rem] font-[400] text-[#eaeef4]">Sort By</label>
 
         <select
+          id="sort-by"
           [ngModel]="selectedSort"
           (ngModelChange)="selectedSortChange.emit($event)"
-          class="pl-2 pr-2 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)]"
+          class="pl-2 pr-2 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)] focus-visible:ring-2 focus-visible:ring-[#789bb8]"
         >
           <option *ngFor="let option of sortOptions" [ngValue]="option.value">
             {{ option.label }}
@@ -107,26 +95,28 @@
       </div>
 
       <div class="col-span-1">
-        <label class="text-[0.75rem] font-[400] text-[#eaeef4]">Start Date</label>
+        <label for="start-date" class="text-[0.75rem] font-[400] text-[#eaeef4]">Start Date</label>
 
         <input
+          id="start-date"
           [ngModel]="customStartDate"
           (ngModelChange)="customStartDateChange.emit($event)"
           type="date"
           [max]="maxDate"
-          class="pl-2 pr-2 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)]"
+          class="pl-2 pr-2 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)] focus-visible:ring-2 focus-visible:ring-[#789bb8]"
         />
       </div>
 
       <div class="col-span-1">
-        <label class="text-[0.75rem] font-[400] text-[#eaeef4]">End Date</label>
+        <label for="end-date" class="text-[0.75rem] font-[400] text-[#eaeef4]">End Date</label>
 
         <input
+          id="end-date"
           [ngModel]="customEndDate"
           (ngModelChange)="customEndDateChange.emit($event)"
           type="date"
           [max]="maxDate"
-          class="pl-2 pr-2 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)]"
+          class="pl-2 pr-2 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)] focus-visible:ring-2 focus-visible:ring-[#789bb8]"
         />
       </div>
     </div>
