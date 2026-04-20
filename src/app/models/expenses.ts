@@ -6,7 +6,7 @@ export type ExpenseCategory =
   | 'Health'
   | 'Other';
 
-export interface Expenses {
+export interface Expense {
   id: number;
   title: string;
   amount: number;

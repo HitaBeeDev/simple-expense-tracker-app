@@ -4,27 +4,29 @@
       Monthly Breakdown
     </p>
 
-    <div *ngIf="monthlyBreakdown.length; else noMonthlyBreakdown" class="mt-4">
-      <div class="flex flex-col mt-3" *ngFor="let month of monthlyBreakdown; let last = last">
-        <div class="flex flex-row items-center justify-between ml-3 mr-3 mb-[0.4rem]">
-          <p class="text-[0.8rem] font-[400] tracking-[0.22em] text-[#2e4a62]">
-            {{ month.label }}
-          </p>
-
-          <p class="text-[0.9rem] font-[600] tracking-[0.22em] text-[#2e4a62]">
-            {{ month.total | currency: selectedCurrency : 'symbol' : '1.2-2' }}
-          </p>
-        </div>
-
-        <div *ngIf="!last" class="w-full bg-[#f9fafb] h-[0.08rem]"></div>
+    @if (monthlyBreakdown.length) {
+      <div class="mt-4">
+        @for (month of monthlyBreakdown; track month.label; let last = $last) {
+          <div class="flex flex-col mt-3">
+            <div class="flex flex-row items-center justify-between ml-3 mr-3 mb-[0.4rem]">
+              <p class="text-[0.8rem] font-[400] tracking-[0.22em] text-[#2e4a62]">
+                {{ month.label }}
+              </p>
+              <p class="text-[0.9rem] font-[600] tracking-[0.22em] text-[#2e4a62]">
+                {{ month.total | currency: selectedCurrency : 'symbol' : '1.2-2' }}
+              </p>
+            </div>
+            @if (!last) {
+              <div class="w-full bg-[#f9fafb] h-[0.08rem]"></div>
+            }
+          </div>
+        }
       </div>
-    </div>
-
-    <ng-template #noMonthlyBreakdown>
+    } @else {
       <div class="rounded-2xl bg-[rgba(255,255,255,0.62)] p-4 text-[0.92rem] text-[#4a5e78]">
         No visible expenses for monthly totals.
       </div>
-    </ng-template>
+    }
   </div>
 
   <div class="col-span-1 p-5 rounded-[1rem] bg-white">
@@ -32,32 +34,33 @@
       Category Totals
     </p>
 
-    <div *ngIf="categoryTotals.length; else noCategoryTotals" class="mt-4">
-      <div class="flex flex-col mt-3" *ngFor="let item of categoryTotals; let last = last">
-        <div class="flex flex-row items-center justify-between ml-3 mr-3 mb-[0.4rem]">
-          <div class="flex flex-row items-center gap-3">
-            <p class="text-[0.8rem] font-[400] tracking-[0.22em] text-[#2e4a62]">
-              {{ categoryIcons[item.category] }}
-            </p>
-
-            <p class="text-[0.8rem] font-[400] tracking-[0.22em] text-[#2e4a62]">
-              {{ item.label }}
-            </p>
+    @if (categoryTotals.length) {
+      <div class="mt-4">
+        @for (item of categoryTotals; track item.category; let last = $last) {
+          <div class="flex flex-col mt-3">
+            <div class="flex flex-row items-center justify-between ml-3 mr-3 mb-[0.4rem]">
+              <div class="flex flex-row items-center gap-3">
+                <p class="text-[0.8rem] font-[400] tracking-[0.22em] text-[#2e4a62]">
+                  {{ categoryIcons[item.category] }}
+                </p>
+                <p class="text-[0.8rem] font-[400] tracking-[0.22em] text-[#2e4a62]">
+                  {{ item.label }}
+                </p>
+              </div>
+              <p class="text-[0.9rem] font-[600] tracking-[0.22em] text-[#2e4a62]">
+                {{ item.total | currency: selectedCurrency : 'symbol' : '1.2-2' }}
+              </p>
+            </div>
+            @if (!last) {
+              <div class="w-full bg-[#f3f4f6] h-[0.08rem]"></div>
+            }
           </div>
-
-          <p class="text-[0.9rem] font-[600] tracking-[0.22em] text-[#2e4a62]">
-            {{ item.total | currency: selectedCurrency : 'symbol' : '1.2-2' }}
-          </p>
-        </div>
-
-        <div *ngIf="!last" class="w-full bg-[#f3f4f6] h-[0.08rem]"></div>
+        }
       </div>
-    </div>
-
-    <ng-template #noCategoryTotals>
+    } @else {
       <div class="rounded-2xl bg-[rgba(255,255,255,0.62)] p-4 text-[0.92rem] text-[#4a5e78]">
         No visible expenses for category totals.
       </div>
-    </ng-template>
+    }
   </div>
 </div>

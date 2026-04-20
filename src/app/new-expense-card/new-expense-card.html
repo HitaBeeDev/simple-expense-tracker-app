@@ -1,7 +1,6 @@
 <div class="bg-[#2d3c4d] p-[1.7rem] rounded-[1rem] mt-5">
   <div class="flex flex-row items-center justify-between">
     <p class="text-[0.8rem] font-[500] text-[#eaeef4]">New Expense</p>
-
     <p class="text-[0.8rem] font-[500] text-[#eaeef4]">Add a record</p>
   </div>
 
@@ -57,11 +56,11 @@
           id="expense-category"
           [ngModel]="newExpenseCategory"
           (ngModelChange)="newExpenseCategoryChange.emit($event)"
-          class="mt-1 pl-2 pr-2 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)] focus-visible:ring-2 focus-visible:ring-[#789bb8]"
+          class="mt-1 pl-2 pr-2 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)] focus-visible:ring-2 focus-visible:ring-[#789bb8]"
         >
-          <option *ngFor="let category of categories" [ngValue]="category.value">
-            {{ category.icon }} {{ category.value }}
-          </option>
+          @for (category of categories; track category.value) {
+            <option [ngValue]="category.value">{{ category.icon }} {{ category.value }}</option>
+          }
         </select>
       </div>
 
@@ -72,23 +71,23 @@
           id="expense-currency"
           [ngModel]="selectedCurrency"
           (ngModelChange)="onCurrencyChange($event)"
-          class="mt-1 pl-2 pr-2 h-[2.5rem] w-full text-[0.75rem] rounded-[0.5rem] bg-[#f5f7fa] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)] focus-visible:ring-2 focus-visible:ring-[#789bb8]"
+          class="mt-1 pl-2 pr-2 h-[2.5rem] w-full text-[0.75rem] rounded-[0.5rem] bg-[#f5f7fa] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)] focus-visible:ring-2 focus-visible:ring-[#789bb8]"
         >
-          <option *ngFor="let option of currencyOptions" [ngValue]="option.value">
-            {{ option.label }}
-          </option>
+          @for (option of currencyOptions; track option.value) {
+            <option [ngValue]="option.value">{{ option.label }}</option>
+          }
         </select>
       </div>
     </div>
   </div>
 
-  <div
-    *ngIf="addExpenseErrors.length"
-    role="alert"
-    class="mt-4 rounded-[0.4rem] bg-[rgba(255,231,236,0.9)] p-1 text-[0.8rem] text-[#9f2746]"
-  >
-    <p *ngFor="let error of addExpenseErrors">{{ error }}</p>
-  </div>
+  @if (addExpenseErrors.length) {
+    <div role="alert" class="mt-4 rounded-[0.4rem] bg-[rgba(255,231,236,0.9)] p-1 text-[0.8rem] text-[#9f2746]">
+      @for (error of addExpenseErrors; track $index) {
+        <p>{{ error }}</p>
+      }
+    </div>
+  }
 
   <button
     type="button"

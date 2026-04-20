@@ -1,6 +1,6 @@
-import { Expenses } from './models/expenses';
+import { Expense } from './models/expenses';
 
-export const MOCK_EXPENSES: Expenses[] = [
+export const MOCK_EXPENSES: Expense[] = [
   {
     id: 101,
     title: 'Apartment rent',

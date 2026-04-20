@@ -32,9 +32,7 @@
 
     <div class="grid grid-cols-2 gap-3">
       <div class="col-span-1">
-        <label for="search-title" class="text-[0.75rem] font-[400] text-[#eaeef4]"
-          >Search Title</label
-        >
+        <label for="search-title" class="text-[0.75rem] font-[400] text-[#eaeef4]">Search Title</label>
 
         <input
           id="search-title"
@@ -47,20 +45,18 @@
       </div>
 
       <div class="col-span-1">
-        <label for="filter-category" class="text-[0.75rem] font-[400] text-[#eaeef4]"
-          >Category</label
-        >
+        <label for="filter-category" class="text-[0.75rem] font-[400] text-[#eaeef4]">Category</label>
 
         <select
           id="filter-category"
           [ngModel]="selectedCategoryFilter"
           (ngModelChange)="selectedCategoryFilterChange.emit($event)"
-          class="pl-2 pr-2 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)] focus-visible:ring-2 focus-visible:ring-[#789bb8]"
+          class="pl-2 pr-2 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)] focus-visible:ring-2 focus-visible:ring-[#789bb8]"
         >
           <option [ngValue]="allCategoriesValue">All Categories</option>
-          <option *ngFor="let category of categories" [ngValue]="category.value">
-            {{ category.icon }} {{ category.value }}
-          </option>
+          @for (category of categories; track category.value) {
+            <option [ngValue]="category.value">{{ category.icon }} {{ category.value }}</option>
+          }
         </select>
       </div>
 
@@ -71,11 +67,11 @@
           id="date-range"
           [ngModel]="selectedDateRange"
           (ngModelChange)="selectedDateRangeChange.emit($event)"
-          class="pl-2 pr-2 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)] focus-visible:ring-2 focus-visible:ring-[#789bb8]"
+          class="pl-2 pr-2 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)] focus-visible:ring-2 focus-visible:ring-[#789bb8]"
         >
-          <option *ngFor="let option of dateRangeOptions" [ngValue]="option.value">
-            {{ option.label }}
-          </option>
+          @for (option of dateRangeOptions; track option.value) {
+            <option [ngValue]="option.value">{{ option.label }}</option>
+          }
         </select>
       </div>
 
@@ -86,11 +82,11 @@
           id="sort-by"
           [ngModel]="selectedSort"
           (ngModelChange)="selectedSortChange.emit($event)"
-          class="pl-2 pr-2 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)] focus-visible:ring-2 focus-visible:ring-[#789bb8]"
+          class="pl-2 pr-2 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)] focus-visible:ring-2 focus-visible:ring-[#789bb8]"
         >
-          <option *ngFor="let option of sortOptions" [ngValue]="option.value">
-            {{ option.label }}
-          </option>
+          @for (option of sortOptions; track option.value) {
+            <option [ngValue]="option.value">{{ option.label }}</option>
+          }
         </select>
       </div>
 
@@ -103,7 +99,7 @@
           (ngModelChange)="customStartDateChange.emit($event)"
           type="date"
           [max]="maxDate"
-          class="pl-2 pr-2 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)] focus-visible:ring-2 focus-visible:ring-[#789bb8]"
+          class="pl-2 pr-2 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)] focus-visible:ring-2 focus-visible:ring-[#789bb8]"
         />
       </div>
 
@@ -116,7 +112,7 @@
           (ngModelChange)="customEndDateChange.emit($event)"
           type="date"
           [max]="maxDate"
-          class="pl-2 pr-2 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)] focus-visible:ring-2 focus-visible:ring-[#789bb8]"
+          class="pl-2 pr-2 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)] focus-visible:ring-2 focus-visible:ring-[#789bb8]"
         />
       </div>
     </div>

@@ -1,7 +1,7 @@
-import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ExpenseCategory, Expenses } from '../models/expenses';
+import { DatePipe, CurrencyPipe } from '@angular/common';
+import { ExpenseCategory, Expense } from '../models/expenses';
 
 type CategoryOption = {
   value: ExpenseCategory;
@@ -11,11 +11,11 @@ type CategoryOption = {
 @Component({
   selector: 'app-expenses-activity-card',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule, DatePipe, CurrencyPipe],
   templateUrl: './expenses-activity-card.html',
 })
 export class ExpensesActivityCardComponent {
-  @Input() filteredExpenses: Expenses[] = [];
+  @Input() filteredExpenses: Expense[] = [];
   @Input() selectedCurrency = '';
   @Input() editingExpenseId: number | null = null;
   @Input() editExpenseTitle = '';
@@ -30,7 +30,7 @@ export class ExpensesActivityCardComponent {
   @Input() categories: CategoryOption[] = [];
   @Input() maxDate = '';
 
-  @Output() startEditClick = new EventEmitter<Expenses>();
+  @Output() startEditClick = new EventEmitter<Expense>();
   @Output() saveEditClick = new EventEmitter<number>();
   @Output() cancelEditClick = new EventEmitter<void>();
   @Output() deleteExpenseClick = new EventEmitter<number>();

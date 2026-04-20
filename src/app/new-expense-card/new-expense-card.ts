@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ExpenseCategory } from '../models/expenses';
@@ -16,7 +15,7 @@ type CurrencyOption = {
 @Component({
   selector: 'app-new-expense-card',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './new-expense-card.html',
 })
 export class NewExpenseCardComponent {

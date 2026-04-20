@@ -1,5 +1,5 @@
-import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
+import { CurrencyPipe } from '@angular/common';
 import { ExpenseCategory } from '../models/expenses';
 
 type SummaryItem = {
@@ -14,7 +14,7 @@ type CategorySummaryItem = SummaryItem & {
 @Component({
   selector: 'app-expense-summaries-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CurrencyPipe],
   templateUrl: './expense-summaries-card.html',
 })
 export class ExpenseSummariesCardComponent {

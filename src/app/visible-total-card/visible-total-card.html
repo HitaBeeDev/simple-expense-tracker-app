@@ -14,39 +14,32 @@
       </p>
     </div>
 
-    <div
-      *ngIf="highestExpense as highestExpenseItem"
-      class="bg-[#fee2e2]/40 rounded-[0.8rem] p-4 min-w-[16rem] min-h-[7rem] flex flex-col"
-    >
-      <p class="text-[0.55rem] font-[700] uppercase tracking-[0.22em] text-[#991b1b]">
-        Highest Expense
-      </p>
+    @if (highestExpense; as item) {
+      <div class="bg-[#fee2e2]/40 rounded-[0.8rem] p-4 min-w-[16rem] min-h-[7rem] flex flex-col">
+        <p class="text-[0.55rem] font-[700] uppercase tracking-[0.22em] text-[#991b1b]">
+          Highest Expense
+        </p>
 
-      <div class="flex flex-row justify-between items-center flex-1 h-full ml-2 mr-2">
-        <div>
-          <p class="text-[0.8rem] font-[500] text-[#2d3c4d]">
-            {{ highestExpenseItem.title }}
-          </p>
-
-          <p class="text-[0.7rem] font-[300] text-[#38516c] mt-2">
-            {{ highestExpenseItem.date | date: 'dd.MM.yyyy' }}
-          </p>
-        </div>
-
-        <div>
-          <p class="text-[0.95rem] font-[700] text-[#ef4444]">
-            {{ highestExpenseItem.amount | currency: selectedCurrency : 'symbol' : '1.2-2' }}
-          </p>
-
-          <div class="flex flex-row items-center gap-1 mt-2">
-            <p class="text-[0.7rem]">{{ highestExpenseCategoryIcon }}</p>
-
-            <p class="text-[0.8rem] font-[500] text-[#2d3c4d]">
-              {{ highestExpenseItem.category }}
+        <div class="flex flex-row justify-between items-center flex-1 h-full ml-2 mr-2">
+          <div>
+            <p class="text-[0.8rem] font-[500] text-[#2d3c4d]">{{ item.title }}</p>
+            <p class="text-[0.7rem] font-[300] text-[#38516c] mt-2">
+              {{ item.date | date: 'dd.MM.yyyy' }}
             </p>
+          </div>
+
+          <div>
+            <p class="text-[0.95rem] font-[700] text-[#ef4444]">
+              {{ item.amount | currency: selectedCurrency : 'symbol' : '1.2-2' }}
+            </p>
+
+            <div class="flex flex-row items-center gap-1 mt-2">
+              <p class="text-[0.7rem]">{{ highestExpenseCategoryIcon }}</p>
+              <p class="text-[0.8rem] font-[500] text-[#2d3c4d]">{{ item.category }}</p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    }
   </div>
 </div>
