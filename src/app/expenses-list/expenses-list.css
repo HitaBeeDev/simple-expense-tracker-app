@@ -1,7 +1,7 @@
 .expense-page {
   position: relative;
   min-height: 100vh;
-  overflow: hidden;
+  overflow-x: hidden;
   background:
     radial-gradient(circle at top left, rgba(120, 145, 210, 0.18), transparent 28rem),
     linear-gradient(180deg, #edf2fb 0%, #e3eaf7 45%, #d8e1f0 100%);
@@ -44,6 +44,7 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  min-width: 0;
 }
 
 .expense-card {
@@ -56,6 +57,7 @@
 }
 
 .expense-card--hero {
+  background-color: #243865;
   background:
     linear-gradient(145deg, rgba(36, 56, 101, 0.95), rgba(58, 84, 145, 0.88));
   color: #f8fbff;
@@ -489,6 +491,8 @@
   .expense-sidebar {
     position: sticky;
     top: 1.5rem;
+    align-self: start;
+    height: fit-content;
   }
 
   .expense-form-grid,
@@ -510,6 +514,24 @@
 }
 
 @media (max-width: 1023px) {
+  .expense-layout {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 1rem;
+  }
+
+  .expense-card {
+    padding: 1.1rem;
+    border-radius: 1.35rem;
+  }
+
+  .expense-title {
+    font-size: 2rem;
+  }
+
+  .expense-donut-chart {
+    width: min(16rem, 100%);
+  }
+
   .expense-card__header,
   .expense-topbar,
   .expense-highlight,
@@ -522,5 +544,16 @@
   .expense-topbar__meta,
   .expense-list-item__side {
     justify-content: flex-start;
+  }
+
+  .expense-actions {
+    width: 100%;
+  }
+
+  .expense-secondary-button,
+  .expense-tag-button,
+  .expense-primary-button--sm {
+    width: 100%;
+    justify-content: center;
   }
 }

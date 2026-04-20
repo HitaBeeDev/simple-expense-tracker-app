@@ -1,25 +1,8 @@
-import {
-  AfterViewChecked,
-  AfterViewInit,
-  Component,
-  ElementRef,
-  OnDestroy,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ExpenseCategory, Expenses } from '../models/expenses';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MOCK_EXPENSES } from '../mock-expenses';
-import {
-  ArcElement,
-  Chart,
-  DoughnutController,
-  Legend,
-  Plugin,
-  Tooltip,
-  TooltipItem,
-} from 'chart.js';
 
 type CategoryOption = {
   value: ExpenseCategory;
@@ -42,43 +25,6 @@ type ChartItem = CategorySummaryItem & {
   percentage: number;
 };
 
-Chart.register(DoughnutController, ArcElement, Tooltip, Legend);
-
-const CENTER_TEXT_PLUGIN: Plugin<'doughnut'> = {
-  id: 'centerText',
-  afterDraw(chart) {
-    const text = chart.options.plugins?.tooltip ? (chart as Chart<'doughnut'> & {
-      $centerText?: { title: string; value: string };
-    }).$centerText : undefined;
-
-    if (!text) {
-      return;
-    }
-
-    const meta = chart.getDatasetMeta(0);
-    const point = meta.data[0];
-
-    if (!point) {
-      return;
-    }
-
-    const { ctx } = chart;
-    const x = point.x;
-    const y = point.y;
-
-    ctx.save();
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillStyle = '#7c89a5';
-    ctx.font = '700 11px Sora, Avenir Next, Segoe UI, sans-serif';
-    ctx.fillText(text.title, x, y - 12);
-    ctx.fillStyle = '#243865';
-    ctx.font = '800 18px Sora, Avenir Next, Segoe UI, sans-serif';
-    ctx.fillText(text.value, x, y + 10);
-    ctx.restore();
-  },
-};
-
 const CATEGORY_OPTIONS: CategoryOption[] = [
   { value: 'Food', icon: '🍽️', colorClass: 'expense-tone-1', chartColor: '#dce4f3' },
   { value: 'Transport', icon: '🚌', colorClass: 'expense-tone-2', chartColor: '#bcc9e3' },
@@ -95,10 +41,7 @@ const CATEGORY_OPTIONS: CategoryOption[] = [
   templateUrl: './expenses-list.html',
   styleUrls: ['./expenses-list.css'],
 })
-export class ExpancesListComponent implements OnInit, AfterViewInit, AfterViewChecked, OnDestroy {
-  @ViewChild('categoryChartCanvas')
-  private categoryChartCanvas?: ElementRef<HTMLCanvasElement>;
-
+export class ExpancesListComponent implements OnInit {
   readonly categories = CATEGORY_OPTIONS;
   readonly allCategoriesValue = 'All';
   readonly storageKeys = {
@@ -144,8 +87,6 @@ export class ExpancesListComponent implements OnInit, AfterViewInit, AfterViewCh
   selectedCurrency: CurrencyCode = 'EUR';
   expenses: Expenses[] = [];
   readonly maxDate = this.formatDateForInput(new Date());
-  private categoryChart?: Chart<'doughnut'>;
-  private lastChartSignature = '';
 
   get filteredExpenses(): Expenses[] {
     return [...this.expenses]
@@ -214,32 +155,15 @@ export class ExpancesListComponent implements OnInit, AfterViewInit, AfterViewCh
   }
 
   ngOnInit(): void {
-    const savedExpenses = localStorage.getItem(this.storageKeys.expenses);
-    const parsedExpenses = savedExpenses ? JSON.parse(savedExpenses) : this.getInitialExpenses();
-    const savedCurrency = localStorage.getItem(this.storageKeys.currency);
+    const savedExpenses = this.readStoredExpenses();
+    const savedCurrency = this.readStorageValue(this.storageKeys.currency);
 
-    this.expenses = parsedExpenses.map((expense: Expenses) => ({
-      ...expense,
-      date: new Date(expense.date),
-      category: this.normalizeCategory(expense.category),
-    }));
+    this.expenses = savedExpenses ?? this.getInitialExpenses();
     this.selectedCurrency = this.normalizeCurrency(savedCurrency);
 
     if (!savedExpenses) {
       this.saveExpenses();
     }
-  }
-
-  ngAfterViewInit(): void {
-    this.renderCategoryChart();
-  }
-
-  ngAfterViewChecked(): void {
-    this.renderCategoryChart();
-  }
-
-  ngOnDestroy(): void {
-    this.categoryChart?.destroy();
   }
 
   addExpense() {
@@ -350,7 +274,7 @@ export class ExpancesListComponent implements OnInit, AfterViewInit, AfterViewCh
   }
 
   saveCurrencyPreference() {
-    localStorage.setItem(this.storageKeys.currency, this.selectedCurrency);
+    this.writeStorageValue(this.storageKeys.currency, this.selectedCurrency);
   }
 
   exportVisibleExpensesToCsv() {
@@ -400,88 +324,76 @@ export class ExpancesListComponent implements OnInit, AfterViewInit, AfterViewCh
   }
 
   private saveExpenses() {
-    localStorage.setItem(this.storageKeys.expenses, JSON.stringify(this.expenses));
+    this.writeStorageValue(this.storageKeys.expenses, JSON.stringify(this.expenses));
   }
 
-  private renderCategoryChart() {
-    const canvas = this.categoryChartCanvas?.nativeElement;
+  private readStoredExpenses(): Expenses[] | null {
+    const rawExpenses = this.readStorageValue(this.storageKeys.expenses);
 
-    if (!canvas) {
-      return;
+    if (!rawExpenses) {
+      return null;
     }
 
-    const chartSignature = JSON.stringify({
-      labels: this.categoryChartData.map((item) => item.label),
-      values: this.categoryChartData.map((item) => item.total),
-      currency: this.selectedCurrency,
-    });
+    try {
+      const parsedExpenses = JSON.parse(rawExpenses);
 
-    if (!this.categoryChart) {
-      this.categoryChart = new Chart(canvas, {
-        type: 'doughnut',
-        data: {
-          labels: this.categoryChartData.map((item) => item.label),
-          datasets: [
-            {
-              data: this.categoryChartData.map((item) => item.total),
-              backgroundColor: this.categoryChartData.map(
-                (item) => this.getCategoryDetails(item.category).chartColor
-              ),
-              borderColor: '#f8fbff',
-              borderWidth: 4,
-              hoverOffset: 10,
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          cutout: '68%',
-          plugins: {
-            legend: {
-              display: false,
-            },
-            tooltip: {
-              backgroundColor: 'rgba(36, 56, 101, 0.96)',
-              titleColor: '#f8fbff',
-              bodyColor: '#e5ecf7',
-              displayColors: false,
-              padding: 12,
-              callbacks: {
-                label: (context: TooltipItem<'doughnut'>) => {
-                  const item = this.categoryChartData[context.dataIndex];
+      if (!Array.isArray(parsedExpenses)) {
+        return null;
+      }
 
-                  if (!item) {
-                    return '';
-                  }
+      const sanitizedExpenses = parsedExpenses
+        .map((expense) => this.sanitizeExpense(expense))
+        .filter((expense): expense is Expenses => expense !== null);
 
-                  return `${this.formatCurrency(item.total)} • ${item.percentage.toFixed(1)}%`;
-                },
-              },
-            },
-          },
-        },
-        plugins: [CENTER_TEXT_PLUGIN],
-      });
+      return sanitizedExpenses.length ? sanitizedExpenses : null;
+    } catch (error) {
+      console.error('Failed to read saved expenses from storage:', error);
+      return null;
+    }
+  }
+
+  private sanitizeExpense(expense: unknown): Expenses | null {
+    if (!expense || typeof expense !== 'object') {
+      return null;
     }
 
-    if (!this.categoryChart || this.lastChartSignature === chartSignature) {
-      return;
+    const candidate = expense as Partial<Expenses> & { date?: string | Date };
+    const normalizedTitle = typeof candidate.title === 'string' ? candidate.title.trim() : '';
+    const normalizedAmount = Number(candidate.amount);
+    const normalizedDate = new Date(candidate.date ?? '');
+
+    if (!normalizedTitle || Number.isNaN(normalizedAmount) || normalizedAmount <= 0) {
+      return null;
     }
 
-    this.categoryChart.data.labels = this.categoryChartData.map((item) => item.label);
-    this.categoryChart.data.datasets[0].data = this.categoryChartData.map((item) => item.total);
-    this.categoryChart.data.datasets[0].backgroundColor = this.categoryChartData.map(
-      (item) => this.getCategoryDetails(item.category).chartColor
-    );
-    (this.categoryChart as Chart<'doughnut'> & {
-      $centerText?: { title: string; value: string };
-    }).$centerText = {
-      title: 'Visible',
-      value: this.formatCurrency(this.visibleTotal, 0),
+    if (Number.isNaN(normalizedDate.getTime())) {
+      return null;
+    }
+
+    return {
+      id: typeof candidate.id === 'number' ? candidate.id : Date.now() + Math.floor(Math.random() * 1000),
+      title: normalizedTitle,
+      amount: normalizedAmount,
+      date: normalizedDate,
+      category: this.normalizeCategory(candidate.category),
     };
-    this.categoryChart.update();
-    this.lastChartSignature = chartSignature;
+  }
+
+  private readStorageValue(key: string): string | null {
+    try {
+      return localStorage.getItem(key);
+    } catch (error) {
+      console.error(`Failed to read "${key}" from storage:`, error);
+      return null;
+    }
+  }
+
+  private writeStorageValue(key: string, value: string) {
+    try {
+      localStorage.setItem(key, value);
+    } catch (error) {
+      console.error(`Failed to write "${key}" to storage:`, error);
+    }
   }
 
   private getInitialExpenses(): Expenses[] {
