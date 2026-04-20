@@ -1,74 +1,86 @@
-<section class="expense-page">
-  <div class="expense-page__glow expense-page__glow--one"></div>
-  <div class="expense-page__glow expense-page__glow--two"></div>
+<section class="grid grid-cols-9 min-h-screen m-6 w-full gap-5">
+  <div class="col-span-3 h-full w-full">
+    <div class="bg-[#1e2733] p-[1.6rem] rounded-[1rem]">
+      <p class="text-[0.55rem] font-[400] uppercase tracking-[0.22em] text-[#436586]">
+        Expense Dashboard
+      </p>
 
-  <div class="expense-layout">
-    <aside class="expense-sidebar">
-      <div class="expense-card expense-card--hero">
-        <p class="expense-eyebrow">Expense Dashboard</p>
-        <h1 class="expense-title">Track spending without losing the overview.</h1>
-        <p class="expense-subtitle">
-          Add expenses on the left. Review summaries, charts, and the full activity stream on the right.
-        </p>
+      <h1 class="text-[2.4rem] leading-[1.05] font-[800] tracking-[-0.04em] text-[#eaeef4] mt-4">
+        Track spending without losing the overview.
+      </h1>
+
+      <p class="text-[0.6rem] font-[600] tracking-[0.22em] text-[#d0dce7] mt-2">
+        Add expenses on the left. Review summaries, charts, and the full activity stream on the
+        right.
+      </p>
+    </div>
+
+    <div class="bg-[#2e4256] p-[1.3rem] rounded-[1rem] mt-3">
+      <div class="flex flex-row items-center justify-between">
+        <p class="text-[0.8rem] font-[500] text-[#eaeef4]">New Expense</p>
+
+        <p class="text-[0.8rem] font-[500] text-[#eaeef4]">Add a record</p>
       </div>
 
-      <div class="expense-card">
-        <div class="expense-card__header">
-          <div>
-            <p class="expense-eyebrow">New Expense</p>
-            <h2 class="expense-section-title">Add a record</h2>
-          </div>
-          <div class="expense-mini-pill">Live sync</div>
+      <div class="mt-4">
+        <div>
+          <label class="text-[0.75rem] font-[400] text-[#eaeef4]">Expense Title</label>
+
+          <input
+            [(ngModel)]="newExpenseTitle"
+            type="text"
+            placeholder="e.g. Grocery shopping, gym membership..."
+            class="mt-1 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] px-4 py-[0.85rem] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)]"
+          />
         </div>
 
-        <div class="expense-form-grid">
-          <div class="expense-field">
-            <label class="expense-label">Expense Title</label>
-            <input
-              [(ngModel)]="newExpenseTitle"
-              type="text"
-              placeholder="e.g. Grocery shopping, gym membership..."
-              class="expense-input"
-            />
-          </div>
+        <div class="mt-4 grid grid-cols-2 items-center justify-center gap-3">
+          <div class="col-span-1">
+            <label class="text-[0.75rem] font-[400] text-[#eaeef4]">Expense Amount</label>
 
-          <div class="expense-field">
-            <label class="expense-label">Expense Amount</label>
             <input
               [(ngModel)]="newExpenseAmount"
               type="number"
               min="0.01"
               step="0.01"
               placeholder="Add your expense amount here"
-              class="expense-input"
+              class="mt-1 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] px-4 py-[0.85rem] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)]"
             />
           </div>
 
-          <div class="expense-field">
-            <label class="expense-label">Expense Date</label>
+          <div class="col-span-1">
+            <label class="text-[0.75rem] font-[400] text-[#eaeef4]">Expense Date</label>
+
             <input
               [(ngModel)]="newExpenseDate"
               type="date"
               [max]="maxDate"
-              class="expense-input"
+              class="mt-1 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] px-4 py-[0.85rem] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)]"
             />
           </div>
+        </div>
 
-          <div class="expense-field">
-            <label class="expense-label">Category</label>
-            <select [(ngModel)]="newExpenseCategory" class="expense-input">
+        <div class="mt-4 grid grid-cols-2 items-center justify-center gap-3">
+          <div class="col-span-1">
+            <label class="text-[0.75rem] font-[400] text-[#eaeef4]">Category</label>
+
+            <select
+              [(ngModel)]="newExpenseCategory"
+              class="mt-1 h-[2.5rem] text-[0.75rem] w-full rounded-[0.5rem] bg-[#f5f7fa] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)]"
+            >
               <option *ngFor="let category of categories" [ngValue]="category.value">
                 {{ category.icon }} {{ category.value }}
               </option>
             </select>
           </div>
 
-          <div class="expense-field">
-            <label class="expense-label">Currency</label>
+          <div class="col-span-1">
+            <label class="text-[0.75rem] font-[400] text-[#eaeef4]">Currency</label>
+
             <select
               [(ngModel)]="selectedCurrency"
               (ngModelChange)="saveCurrencyPreference()"
-              class="expense-input"
+              class="mt-1 h-[2.5rem] w-full text-[0.75rem] rounded-[0.5rem] bg-[#f5f7fa] text-[#243865] outline-none transition-[border-color,box-shadow,transform] duration-150 placeholder:text-[#8b98b6] focus:border-[rgba(58,84,145,0.42)] focus:shadow-[0_0_0_4px_rgba(58,84,145,0.14)]"
             >
               <option *ngFor="let option of currencyOptions" [ngValue]="option.value">
                 {{ option.label }}
@@ -76,312 +88,23 @@
             </select>
           </div>
         </div>
-
-        <div *ngIf="addExpenseErrors.length" class="expense-error-box">
-          <p *ngFor="let error of addExpenseErrors">{{ error }}</p>
-        </div>
-
-        <button (click)="addExpense()" class="expense-primary-button">Add Expense</button>
       </div>
 
-    </aside>
-
-    <main class="expense-content">
-      <div class="expense-topbar">
-        <div>
-          <p class="expense-eyebrow">Overview</p>
-          <h2 class="expense-content-title">Added expenses and live summaries</h2>
-        </div>
-        <div class="expense-topbar__meta">
-          <span class="expense-stat-chip">
-            {{ filteredExpenses.length }} visible
-          </span>
-          <span class="expense-stat-chip expense-stat-chip--solid">
-            {{ visibleTotal | currency : selectedCurrency : 'symbol' : '1.2-2' }}
-          </span>
-        </div>
+      <div
+        *ngIf="addExpenseErrors.length"
+        class="mt-4 rounded-[0.4rem] bg-[rgba(255,231,236,0.9)] p-1 text-[0.8rem] text-[#9f2746]"
+      >
+        <p *ngFor="let error of addExpenseErrors">{{ error }}</p>
       </div>
 
-      <div class="expense-card expense-card--controls">
-        <div class="expense-card__header">
-          <div>
-            <p class="expense-eyebrow">Controls</p>
-            <h2 class="expense-section-title">Search, sort, filter</h2>
-          </div>
-          <div class="expense-actions">
-            <button (click)="exportVisibleExpensesToCsv()" class="expense-secondary-button">
-              Export CSV
-            </button>
-            <button
-              *ngIf="hasActiveFilters || selectedSort !== 'date-desc'"
-              (click)="clearFilters()"
-              class="expense-secondary-button expense-secondary-button--ghost"
-            >
-              Reset
-            </button>
-          </div>
-        </div>
-
-        <div class="expense-form-grid expense-form-grid--controls">
-          <div class="expense-field">
-            <label class="expense-label">Search Title</label>
-            <input
-              [(ngModel)]="searchQuery"
-              type="text"
-              placeholder="Search expenses..."
-              class="expense-input"
-            />
-          </div>
-
-          <div class="expense-field">
-            <label class="expense-label">Category</label>
-            <select [(ngModel)]="selectedCategoryFilter" class="expense-input">
-              <option [ngValue]="allCategoriesValue">All Categories</option>
-              <option *ngFor="let category of categories" [ngValue]="category.value">
-                {{ category.icon }} {{ category.value }}
-              </option>
-            </select>
-          </div>
-
-          <div class="expense-field">
-            <label class="expense-label">Date Range</label>
-            <select [(ngModel)]="selectedDateRange" class="expense-input">
-              <option *ngFor="let option of dateRangeOptions" [ngValue]="option.value">
-                {{ option.label }}
-              </option>
-            </select>
-          </div>
-
-          <div class="expense-field">
-            <label class="expense-label">Sort By</label>
-            <select [(ngModel)]="selectedSort" class="expense-input">
-              <option *ngFor="let option of sortOptions" [ngValue]="option.value">
-                {{ option.label }}
-              </option>
-            </select>
-          </div>
-
-          <div *ngIf="selectedDateRange === 'custom'" class="expense-field">
-            <label class="expense-label">Start Date</label>
-            <input
-              [(ngModel)]="customStartDate"
-              type="date"
-              [max]="maxDate"
-              class="expense-input"
-            />
-          </div>
-
-          <div *ngIf="selectedDateRange === 'custom'" class="expense-field">
-            <label class="expense-label">End Date</label>
-            <input
-              [(ngModel)]="customEndDate"
-              type="date"
-              [max]="maxDate"
-              class="expense-input"
-            />
-          </div>
-        </div>
+      <div
+        (click)="addExpense()"
+        class="mt-4 flex justify-center items-center w-full bg-[#789bb8] rounded-[0.5rem] h-[2.4rem] text-[0.76rem] font-[500] cursor-pointer text-[#f5f7fa] transition-all duration-300 hover:bg-[#577ea0]"
+      >
+        <p>Add Expense</p>
       </div>
-
-      <div class="expense-summary-grid">
-        <div class="expense-card expense-card--metric">
-          <p class="expense-eyebrow">Visible Total</p>
-          <p class="expense-metric-value">
-            {{ visibleTotal | currency : selectedCurrency : 'symbol' : '1.2-2' }}
-          </p>
-          <p class="expense-muted">
-            {{ filteredExpenses.length }} expense{{ filteredExpenses.length === 1 ? '' : 's' }} in current view
-          </p>
-
-          <div *ngIf="highestExpense; else noHighestExpense" class="expense-highlight">
-            <div>
-              <p class="expense-highlight__label">Highest Expense</p>
-              <p class="expense-highlight__title">{{ highestExpense.title }}</p>
-              <p class="expense-highlight__date">{{ highestExpense.date | date : 'dd.MM.yyyy' }}</p>
-            </div>
-            <div class="text-right">
-              <p class="expense-highlight__amount">
-                {{ highestExpense.amount | currency : selectedCurrency : 'symbol' : '1.2-2' }}
-              </p>
-              <span
-                class="inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium"
-                [ngClass]="getCategoryDetails(highestExpense.category).colorClass"
-              >
-                <span>{{ getCategoryDetails(highestExpense.category).icon }}</span>
-                <span>{{ highestExpense.category }}</span>
-              </span>
-            </div>
-          </div>
-
-          <ng-template #noHighestExpense>
-            <div class="expense-empty-inline">Add or reveal expenses to see the highest item.</div>
-          </ng-template>
-        </div>
-
-        <div class="expense-card">
-          <p class="expense-eyebrow">Monthly Breakdown</p>
-          <div *ngIf="monthlyBreakdown.length; else noMonthlyBreakdown" class="expense-stack-list">
-            <div *ngFor="let month of monthlyBreakdown" class="expense-row-card">
-              <span>{{ month.label }}</span>
-              <span class="font-semibold">
-                {{ month.total | currency : selectedCurrency : 'symbol' : '1.2-2' }}
-              </span>
-            </div>
-          </div>
-
-          <ng-template #noMonthlyBreakdown>
-            <div class="expense-empty-inline">No visible expenses for monthly totals.</div>
-          </ng-template>
-        </div>
-
-        <div class="expense-card">
-          <p class="expense-eyebrow">Category Totals</p>
-          <div *ngIf="categoryTotals.length; else noCategoryTotals" class="expense-stack-list">
-            <div *ngFor="let item of categoryTotals" class="expense-row-card">
-              <span
-                class="inline-flex items-center gap-2 rounded-full px-2 py-1 text-xs font-medium"
-                [ngClass]="getCategoryDetails(item.category).colorClass"
-              >
-                <span>{{ getCategoryDetails(item.category).icon }}</span>
-                <span>{{ item.label }}</span>
-              </span>
-              <span class="font-semibold">
-                {{ item.total | currency : selectedCurrency : 'symbol' : '1.2-2' }}
-              </span>
-            </div>
-          </div>
-
-          <ng-template #noCategoryTotals>
-            <div class="expense-empty-inline">No visible expenses for category totals.</div>
-          </ng-template>
-        </div>
-      </div>
-
-      <div class="expense-card">
-        <div class="expense-card__header">
-          <div>
-            <p class="expense-eyebrow">Category Chart</p>
-            <h3 class="expense-section-title">Share of visible spending</h3>
-          </div>
-        </div>
-
-        <div *ngIf="categoryChartData.length; else noChartData" class="expense-donut-layout">
-          <div class="expense-chart-list expense-chart-list--full">
-            <div *ngFor="let item of categoryChartData" class="expense-chart-row">
-              <div class="expense-chart-row__top">
-                <span
-                  class="inline-flex items-center gap-2 rounded-full px-2 py-1 text-xs font-medium"
-                  [ngClass]="getCategoryDetails(item.category).colorClass"
-                >
-                  <span>{{ getCategoryDetails(item.category).icon }}</span>
-                  <span>{{ item.label }}</span>
-                </span>
-                <div class="text-right">
-                  <p class="font-semibold text-slate-800">
-                    {{ item.total | currency : selectedCurrency : 'symbol' : '1.2-2' }}
-                  </p>
-                  <p class="text-xs text-slate-500">{{ item.percentage.toFixed(1) }}%</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <ng-template #noChartData>
-          <div class="expense-empty-inline">No visible expenses for the category chart.</div>
-        </ng-template>
-      </div>
-
-      <div class="expense-card">
-        <div class="expense-card__header">
-          <div>
-            <p class="expense-eyebrow">Activity</p>
-            <h3 class="expense-section-title">Added expenses</h3>
-          </div>
-          <div class="expense-mini-pill">Sorted live</div>
-        </div>
-
-        <div *ngIf="filteredExpenses.length; else noExpenses" class="expense-list">
-          <article *ngFor="let expense of filteredExpenses" class="expense-list-item">
-            <div *ngIf="editingExpenseId !== expense.id; else editRow" class="expense-list-item__view">
-              <div class="expense-list-item__main">
-                <span
-                  class="inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-xs font-medium"
-                  [ngClass]="getCategoryDetails(expense.category).colorClass"
-                >
-                  <span>{{ getCategoryDetails(expense.category).icon }}</span>
-                  <span>{{ expense.category }}</span>
-                </span>
-                <div class="min-w-0">
-                  <p class="truncate text-base font-semibold text-slate-800">{{ expense.title }}</p>
-                  <p class="text-sm text-slate-500">{{ expense.date | date : 'dd.MM.yyyy' }}</p>
-                </div>
-              </div>
-
-              <div class="expense-list-item__side">
-                <p class="expense-list-item__amount">
-                  {{ expense.amount | currency : selectedCurrency : 'symbol' : '1.2-2' }}
-                </p>
-                <div class="expense-actions">
-                  <button (click)="startEdit(expense)" class="expense-tag-button">Edit</button>
-                  <button
-                    (click)="deleteExpense(expense.id)"
-                    class="expense-tag-button expense-tag-button--danger"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <ng-template #editRow>
-              <div class="expense-edit-grid">
-                <input [(ngModel)]="editExpenseTitle" type="text" class="expense-input" />
-                <input
-                  [(ngModel)]="editExpenseAmount"
-                  type="number"
-                  min="0.01"
-                  step="0.01"
-                  class="expense-input"
-                />
-                <input
-                  [(ngModel)]="editExpenseDate"
-                  type="date"
-                  [max]="maxDate"
-                  class="expense-input"
-                />
-                <select [(ngModel)]="editExpenseCategory" class="expense-input">
-                  <option *ngFor="let category of categories" [ngValue]="category.value">
-                    {{ category.icon }} {{ category.value }}
-                  </option>
-                </select>
-              </div>
-
-              <div class="expense-actions expense-actions--spaced mt-3">
-                <button (click)="saveEdit(expense.id)" class="expense-primary-button expense-primary-button--sm">
-                  Save
-                </button>
-                <button
-                  (click)="cancelEdit()"
-                  class="expense-secondary-button expense-secondary-button--ghost"
-                >
-                  Cancel
-                </button>
-              </div>
-
-              <div *ngIf="editExpenseErrors.length" class="expense-error-box mt-3">
-                <p *ngFor="let error of editExpenseErrors">{{ error }}</p>
-              </div>
-            </ng-template>
-          </article>
-        </div>
-
-        <ng-template #noExpenses>
-          <div class="expense-empty-state">
-            No expenses match the current search and filters.
-          </div>
-        </ng-template>
-      </div>
-    </main>
+    </div>
   </div>
+
+  <div class="col-span-6 h-full bg-amber-100 w-full">ghfh</div>
 </section>

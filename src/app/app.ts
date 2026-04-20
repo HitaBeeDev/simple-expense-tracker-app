@@ -5,7 +5,6 @@ import { ExpancesListComponent } from './expenses-list/expenses-list';
   selector: 'app-root',
   standalone: true,
   templateUrl: './app.html',
-  styleUrls: ['./app.css'],
   imports: [ExpancesListComponent],
 })
 export class AppComponent {}

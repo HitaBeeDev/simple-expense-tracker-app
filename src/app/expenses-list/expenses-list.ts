@@ -26,12 +26,42 @@ type ChartItem = CategorySummaryItem & {
 };
 
 const CATEGORY_OPTIONS: CategoryOption[] = [
-  { value: 'Food', icon: '🍽️', colorClass: 'expense-tone-1', chartColor: '#dce4f3' },
-  { value: 'Transport', icon: '🚌', colorClass: 'expense-tone-2', chartColor: '#bcc9e3' },
-  { value: 'Housing', icon: '🏠', colorClass: 'expense-tone-3', chartColor: '#9aadd3' },
-  { value: 'Entertainment', icon: '🎬', colorClass: 'expense-tone-4', chartColor: '#6f88bb' },
-  { value: 'Health', icon: '💊', colorClass: 'expense-tone-5', chartColor: '#4b659d' },
-  { value: 'Other', icon: '🧾', colorClass: 'expense-tone-6', chartColor: '#243865' },
+  {
+    value: 'Food',
+    icon: '🍽️',
+    colorClass: 'bg-[#edf2fb] text-[#243865]',
+    chartColor: '#dce4f3',
+  },
+  {
+    value: 'Transport',
+    icon: '🚌',
+    colorClass: 'bg-[#dce4f3] text-[#243865]',
+    chartColor: '#bcc9e3',
+  },
+  {
+    value: 'Housing',
+    icon: '🏠',
+    colorClass: 'bg-[#bcc9e3] text-[#22345d]',
+    chartColor: '#9aadd3',
+  },
+  {
+    value: 'Entertainment',
+    icon: '🎬',
+    colorClass: 'bg-[#9aadd3] text-[#203154]',
+    chartColor: '#6f88bb',
+  },
+  {
+    value: 'Health',
+    icon: '💊',
+    colorClass: 'bg-[#6f88bb] text-[#f7faff]',
+    chartColor: '#4b659d',
+  },
+  {
+    value: 'Other',
+    icon: '🧾',
+    colorClass: 'bg-[#314472] text-[#f7faff]',
+    chartColor: '#243865',
+  },
 ];
 
 @Component({
@@ -39,7 +69,6 @@ const CATEGORY_OPTIONS: CategoryOption[] = [
   standalone: true,
   imports: [FormsModule, CommonModule],
   templateUrl: './expenses-list.html',
-  styleUrls: ['./expenses-list.css'],
 })
 export class ExpancesListComponent implements OnInit {
   readonly categories = CATEGORY_OPTIONS;
