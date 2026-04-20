@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ExpenseCategory } from '../models/expenses';
+import { CurrencyCode } from '../expense.service';
 
 type CategoryOption = {
   value: ExpenseCategory;
@@ -8,7 +9,7 @@ type CategoryOption = {
 };
 
 type CurrencyOption = {
-  value: string;
+  value: CurrencyCode;
   label: string;
 };
 
